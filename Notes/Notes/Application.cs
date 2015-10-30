@@ -20,7 +20,7 @@ namespace Notes
             if (args[0] == "-?")
             {
                 Console.WriteLine("\n\tPossible commands:");
-                Console.WriteLine("\t\t-add <noteName> <content>");
+                Console.WriteLine("\t\t-add <noteName> <description> <content>");
                 Console.WriteLine("\t\t-list");
                 return 1;
             }
@@ -30,11 +30,12 @@ namespace Notes
             {
                 case "-add":
                     {
-                        if (args.Length ==3)
+                        if (args.Length ==4)
                         {
                             string name = args[1];
-                            string content = args[2];
-                            Notes.AddNote(name, content);
+                            string description = args[2];
+                            string content = args[3];
+                            Notes.AddNote(name, description, content);
                             Notes.SaveNotes();
                         }
                         else
@@ -62,6 +63,5 @@ namespace Notes
         {
             Console.WriteLine("\n\tInvalid command. Press -? for help.");
         }
-        
     }
 }

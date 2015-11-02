@@ -9,7 +9,6 @@ namespace Notes
     public class Note
     {
         private string name;
-        private string description;
         private string content;
         
         public string Name
@@ -18,16 +17,28 @@ namespace Notes
             set { this.name = value; }
         }
 
-        public string Description
-        {
-            get { return this.description; }
-            set { this.description = value; }
-        }
-
         public string Content
         {
             get { return this.content; }
             set { this.content = value; }
+        }
+
+        public Note() { }
+
+        public Note(string line)
+        {
+            string nameKeyWord = "Name:";
+            string contentKeyWord = "Content:";
+            int positionName = line.IndexOf(nameKeyWord);
+            int positionContent = line.IndexOf(contentKeyWord);
+
+            int startPosition = positionName + nameKeyWord.Length + 1;
+            int endPosition = positionContent - 2;
+            name = line.Substring(startPosition, endPosition -startPosition);
+            
+            startPosition = positionContent + contentKeyWord.Length + 1;
+            endPosition = line.Length - 1;
+            content = line.Substring(startPosition, endPosition - startPosition);
         }
     }
 }

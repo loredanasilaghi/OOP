@@ -9,99 +9,111 @@ namespace Notes
 {
     public class Notes
     {
-        private static List<Note> allNotes = new List<Note>();
-        private static string path = @"Notes.txt";
-        public static List<Note> AllNotes
+        private List<Note> allNotes = new List<Note>();
+        private string path = @"Notes.txt";
+        public List<Note> AllNotes
         {
             get { return allNotes; }
             set { allNotes = value; }
         }
 
-        public static void AddNote(string name, string description, string content)
+        public void AddNote(string content)
         {
             Note note = new Note();
-            note.Name = name;
-            note.Description = description;
             note.Content = content;
+            note.Name = GenerateNoteName(content);
+            note.Name = ChangeNoteNameIfAlreadyExists(note.Name);
             allNotes.Add(note);
         }
 
-        public static void LoadNotes()
+        public string GenerateNoteName(string content)
+        {
+            string[] contentArray = content.Split(' ');
+            string name = contentArray[0] + " " + contentArray[1];
+            return name;
+        }
+
+        public string ChangeNoteNameIfAlreadyExists(string name)
+        {
+            int counter = 0;
+            for (int i = 0; i <= allNotes.Count - 1; i++)
+            {
+                if (String.Equals(allNotes[i].Name, name, StringComparison.OrdinalIgnoreCase) == true)
+                {
+                    counter++;
+                    name = name + " " + (counter + 1);
+                    break;
+                }
+            }
+            return name;
+        }
+
+        public void RemoveNote(string name)
+        {
+            bool found = false;
+            for (int i = 0; i <= allNotes.Count - 1; i++)
+            {
+                if (String.Equals(allNotes[i].Name, name, StringComparison.OrdinalIgnoreCase) == true)
+                {
+                    found = true;
+                    allNotes.RemoveAt(i);
+                    break;
+                }
+            }
+
+            if (found == false)
+            {
+                Console.WriteLine("\tName invalid. There is no note with this name.");
+            }
+        }
+
+        public void LoadNotes()
         {
             Console.WriteLine("\n\tLoading file...");
             if (!File.Exists(path))
             {
                 Console.WriteLine("\tThe file does not exist. No notes loaded.");
                 return;
-            }
-
+            };
             string line;
             int counter = 0;
             System.IO.StreamReader file = new System.IO.StreamReader(path);
             while ((line = file.ReadLine()) != null)
             {
-                string[] elements = line.Split(' ');
-                Note note = new Note();
-                note.Name = elements[0];
-                note.Description = elements[1];
-                note.Content = elements[2];
+                Note note = new Note(line);
                 allNotes.Add(note);
                 counter++;
             }
-
-            ReplaceUnderlineWithSpace();
-
+            
             file.Close();
 
             Console.WriteLine("\tFile loaded. {0} notes read", counter);
         }
 
-        public static void DisplayNotes()
+        public void DisplayNotes()
         {
             Console.WriteLine("\n\tDisplaying notes...");
             for (int i = 0; i < allNotes.Count; i++)
             {
-                Console.WriteLine("\tName: {0}, description: {1}, content: {2}", allNotes[i].Name, allNotes[i].Description, allNotes[i].Content);
+                Console.WriteLine("\tName: {0}, content: {1}", allNotes[i].Name, allNotes[i].Content);
             }
             Console.WriteLine("\tEnd of list.");
         }
 
-        public static void SaveNotes()
+        public void SaveNotes()
         {
             Console.WriteLine("\n\tSaving file...");
-            StreamWriter file = new StreamWriter(path);
-
-            ReplaceSpaceWithUnderline();
+            StreamWriter file = new StreamWriter(path, false, Encoding.UTF8);
+            
             for (int i = 0; i < allNotes.Count; i++)
             {
-                file.Write(allNotes[i].Name);
-                file.Write(" " + allNotes[i].Description);
-                file.Write(" " + allNotes[i].Content);
+                file.Write("Name:\"" + allNotes[i].Name + "\"");
+                file.Write(" Content:\"" + allNotes[i].Content + "\"");
                 file.Write(file.NewLine);
             }
 
             file.Close();
             Console.WriteLine("\tFile saved. {0} notes saved", allNotes.Count);
-        }
-
-        public static void ReplaceUnderlineWithSpace()
-        {
-            for (int i = 0; i < allNotes.Count; i++)
-            {
-                allNotes[i].Name = allNotes[i].Name.Replace('_', ' ');
-                allNotes[i].Description = allNotes[i].Description.Replace('_', ' ');
-                allNotes[i].Content = allNotes[i].Content.Replace('_', ' ');
-            }
-        }
-
-        public static void ReplaceSpaceWithUnderline()
-        {
-            for (int i = 0; i < allNotes.Count; i++)
-            {
-                allNotes[i].Name = allNotes[i].Name.Replace(' ', '_');
-                allNotes[i].Description = allNotes[i].Description.Replace(' ', '_');
-                allNotes[i].Content = allNotes[i].Content.Replace(' ', '_');
-            }
         }
     }
 }

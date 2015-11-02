@@ -20,23 +20,24 @@ namespace Notes
             if (args[0] == "-?")
             {
                 Console.WriteLine("\n\tPossible commands:");
-                Console.WriteLine("\t\t-add <noteName> <description> <content>");
+                Console.WriteLine("\t\t-add <content>");
+                Console.WriteLine("\t\t-delete <noteName>");
                 Console.WriteLine("\t\t-list");
                 return 1;
             }
 
-            Notes.LoadNotes();
+            Notes notes = new Notes();
+
+            notes.LoadNotes();
             switch (args[0])
             {
                 case "-add":
                     {
-                        if (args.Length ==4)
+                        if (args.Length == 2)
                         {
-                            string name = args[1];
-                            string description = args[2];
-                            string content = args[3];
-                            Notes.AddNote(name, description, content);
-                            Notes.SaveNotes();
+                            string content = args[1];
+                            notes.AddNote(content);
+                            notes.SaveNotes();
                         }
                         else
                         {
@@ -47,7 +48,22 @@ namespace Notes
                     }
                 case "-list":
                     {
-                        Notes.DisplayNotes();
+                        notes.DisplayNotes();
+                        break;
+                    }
+                case "-delete":
+                    {
+                        if (args.Length == 2)
+                        {
+                            string name = args[1];
+                            notes.RemoveNote(name);
+                            notes.SaveNotes();
+                        }
+                        else
+                        {
+                            InvalidCommand();
+                            return -1;
+                        }
                         break;
                     }
                 default:

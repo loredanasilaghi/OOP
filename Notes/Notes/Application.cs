@@ -20,22 +20,32 @@ namespace Notes
             if (args[0] == "-?")
             {
                 Console.WriteLine("\n\tPossible commands:");
-                Console.WriteLine("\t\t-add <noteName> <content>");
+                Console.WriteLine("\t\t-add <name> <content>");
+                Console.WriteLine("\t\t-add <content>");
+                Console.WriteLine("\t\t-delete <noteName>");
                 Console.WriteLine("\t\t-list");
                 return 1;
             }
 
-            Notes.LoadNotes();
+            Notes notes = new Notes();
+
+            notes.LoadNotes();
             switch (args[0])
             {
                 case "-add":
                     {
-                        if (args.Length ==3)
+                        if (args.Length == 2)
+                        {
+                            string content = args[1];
+                            notes.AddNote(content);
+                            notes.SaveNotes();
+                        }
+                        else if (args.Length == 3)
                         {
                             string name = args[1];
                             string content = args[2];
-                            Notes.AddNote(name, content);
-                            Notes.SaveNotes();
+                            notes.AddNote(name, content);
+                            notes.SaveNotes();
                         }
                         else
                         {
@@ -46,7 +56,22 @@ namespace Notes
                     }
                 case "-list":
                     {
-                        Notes.DisplayNotes();
+                        notes.DisplayNotes();
+                        break;
+                    }
+                case "-delete":
+                    {
+                        if (args.Length == 2)
+                        {
+                            string name = args[1];
+                            notes.RemoveNote(name);
+                            notes.SaveNotes();
+                        }
+                        else
+                        {
+                            InvalidCommand();
+                            return -1;
+                        }
                         break;
                     }
                 default:
@@ -62,6 +87,5 @@ namespace Notes
         {
             Console.WriteLine("\n\tInvalid command. Press -? for help.");
         }
-        
     }
 }

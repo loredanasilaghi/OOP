@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Notes
@@ -11,10 +12,11 @@ namespace Notes
     {
         private List<Note> allNotes = new List<Note>();
         private string path = @"Notes.txt";
+
         public List<Note> AllNotes
         {
             get { return allNotes; }
-            set { allNotes = value; }
+            private set { allNotes = value; }
         }
 
         public void AddNote(string content, string name = "")
@@ -28,14 +30,29 @@ namespace Notes
             }
             else
                 note.Name = name;
+            note.Id = (allNotes.Count + 1).ToString();
             allNotes.Add(note);
         }
 
         public string GenerateNoteName(string content)
         {
             string[] contentArray = content.Split(' ');
-            string name = contentArray[0] + " " + contentArray[1];
+            string name = string.Empty;
+            if (contentArray.Length == 1)
+            {
+                name = contentArray[0];
+            }
+            else
+                name = contentArray[0] + " " + contentArray[1];
             return name;
+        }
+
+        public void RegenerateIds()
+        {
+            for (int i = 0; i < allNotes.Count(); i++)
+            {
+                allNotes[i].Id = (i + 1).ToString();
+            }
         }
 
         public string ChangeNoteNameIfAlreadyExists(string name)
@@ -55,12 +72,13 @@ namespace Notes
             return name;
         }
 
-        public void RemoveNote(string name)
+        public void RemoveNote(string id)
         {
+            
             bool found = false;
             for (int i = 0; i <= allNotes.Count - 1; i++)
             {
-                if (String.Equals(allNotes[i].Name, name, StringComparison.OrdinalIgnoreCase) == true)
+                if (String.Equals(allNotes[i].Id, id) == true)
                 {
                     found = true;
                     allNotes.RemoveAt(i);
@@ -70,7 +88,7 @@ namespace Notes
 
             if (found == false)
             {
-                Console.WriteLine("\tName invalid. There is no note with this name.");
+                Console.WriteLine("\tID invalid. There is no note with this ID.");
             }
         }
 
@@ -102,7 +120,7 @@ namespace Notes
             Console.WriteLine("\n\tDisplaying notes...");
             for (int i = 0; i < allNotes.Count; i++)
             {
-                Console.WriteLine("\tName: {0}, content: {1}", allNotes[i].Name, allNotes[i].Content);
+                Console.WriteLine("\tId: {0}, Name: {1}, content: {2}", allNotes[i].Id, allNotes[i].Name, allNotes[i].Content);
             }
             Console.WriteLine("\tEnd of list.");
         }
@@ -114,7 +132,8 @@ namespace Notes
             
             for (int i = 0; i < allNotes.Count; i++)
             {
-                file.Write("Name:\"" + allNotes[i].Name + "\"");
+                file.Write("Id:\"" + allNotes[i].Id + "\"");
+                file.Write(" Name:\"" + allNotes[i].Name + "\"");
                 file.Write(" Content:\"" + allNotes[i].Content + "\"");
                 file.Write(file.NewLine);
             }

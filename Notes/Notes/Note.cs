@@ -10,6 +10,7 @@ namespace Notes
     {
         private string name;
         private string content;
+        private string id;
         
         public string Name
         {
@@ -23,17 +24,29 @@ namespace Notes
             set { this.content = value; }
         }
 
+        public string Id
+        {
+            get { return this.id; }
+            set { this.id = value; }
+        }
+
         public Note() { }
 
         public Note(string line)
         {
+            string idKeyWord = "Id:";
             string nameKeyWord = "Name:";
             string contentKeyWord = "Content:";
+            int positionId = line.IndexOf(idKeyWord);
             int positionName = line.IndexOf(nameKeyWord);
             int positionContent = line.IndexOf(contentKeyWord);
+            
+            int startPosition = positionId + idKeyWord.Length + 1;
+            int endPosition = positionName - 2;
+            id = line.Substring(startPosition, endPosition - startPosition);
 
-            int startPosition = positionName + nameKeyWord.Length + 1;
-            int endPosition = positionContent - 2;
+            startPosition = positionName + nameKeyWord.Length + 1;
+            endPosition = positionContent - 2;
             name = line.Substring(startPosition, endPosition -startPosition);
             
             startPosition = positionContent + contentKeyWord.Length + 1;

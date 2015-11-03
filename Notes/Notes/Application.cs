@@ -22,7 +22,7 @@ namespace Notes
                 Console.WriteLine("\n\tPossible commands:");
                 Console.WriteLine("\t\t-add <name> <content>");
                 Console.WriteLine("\t\t-add <content>");
-                Console.WriteLine("\t\t-delete <noteName>");
+                Console.WriteLine("\t\t-delete <ID>");
                 Console.WriteLine("\t\t-list");
                 return 1;
             }
@@ -30,6 +30,7 @@ namespace Notes
             Notes notes = new Notes();
 
             notes.LoadNotes();
+
             switch (args[0])
             {
                 case "-add":
@@ -63,8 +64,9 @@ namespace Notes
                     {
                         if (args.Length == 2)
                         {
-                            string name = args[1];
-                            notes.RemoveNote(name);
+                            string id = args[1];
+                            notes.RemoveNote(id);
+                            notes.RegenerateIds();
                             notes.SaveNotes();
                         }
                         else

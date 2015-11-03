@@ -20,6 +20,7 @@ namespace Notes
             if (args[0] == "-?")
             {
                 Console.WriteLine("\n\tPossible commands:");
+                Console.WriteLine("\t\t-add <name> <content>");
                 Console.WriteLine("\t\t-add <content>");
                 Console.WriteLine("\t\t-delete <noteName>");
                 Console.WriteLine("\t\t-list");
@@ -37,6 +38,13 @@ namespace Notes
                         {
                             string content = args[1];
                             notes.AddNote(content);
+                            notes.SaveNotes();
+                        }
+                        else if (args.Length == 3)
+                        {
+                            string name = args[1];
+                            string content = args[2];
+                            notes.AddNote(name, content);
                             notes.SaveNotes();
                         }
                         else

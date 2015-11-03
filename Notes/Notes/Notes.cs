@@ -17,12 +17,17 @@ namespace Notes
             set { allNotes = value; }
         }
 
-        public void AddNote(string content)
+        public void AddNote(string content, string name = "")
         {
             Note note = new Note();
             note.Content = content;
-            note.Name = GenerateNoteName(content);
-            note.Name = ChangeNoteNameIfAlreadyExists(note.Name);
+            if (name == "")
+            {
+                note.Name = GenerateNoteName(content);
+                note.Name = ChangeNoteNameIfAlreadyExists(note.Name);
+            }
+            else
+                note.Name = name;
             allNotes.Add(note);
         }
 
@@ -35,15 +40,17 @@ namespace Notes
 
         public string ChangeNoteNameIfAlreadyExists(string name)
         {
-            int counter = 0;
+            int counter = 1;
             for (int i = 0; i <= allNotes.Count - 1; i++)
             {
-                if (String.Equals(allNotes[i].Name, name, StringComparison.OrdinalIgnoreCase) == true)
+                if(allNotes[i].Name.IndexOf(name, 0, StringComparison.OrdinalIgnoreCase) != -1)
                 {
                     counter++;
-                    name = name + " " + (counter + 1);
-                    break;
                 }
+            }
+            if (counter != 1)
+            {
+                name = string.Format("{0} ({1})", name, counter);
             }
             return name;
         }

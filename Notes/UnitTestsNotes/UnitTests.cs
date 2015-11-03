@@ -12,7 +12,7 @@ namespace Notes
     public class UnitTests
     {
         [TestMethod]
-        public void ShouldAddNote()
+        public void ShouldAddNoteWithoutName()
         {
             string content = "Book list for me to read";
             string expectedName = "Book list";
@@ -24,7 +24,19 @@ namespace Notes
         }
 
         [TestMethod]
-        public void ShouldAddNoteWithAlmostTheSameName()
+        public void ShouldAddNoteWithName()
+        {
+            string content = "Book list for me to read";
+            string name = "Book list";
+            Notes notes = new Notes();
+            notes.AddNote(content, name);
+
+            notes.AllNotes[0].Name.ShouldContain(name);
+            notes.AllNotes[0].Content.ShouldContain(content);
+        }
+
+        [TestMethod]
+        public void ShouldAddNoteWithAlmostTheSameContent()
         {
             string contentFirstNote = "Book list for me to read in november";
             Notes notes = new Notes();
@@ -32,10 +44,16 @@ namespace Notes
 
             string contentSecondNote = "Book list for me to read in december";
             notes.AddNote(contentSecondNote);
+            
+            string contentThirdNote = "Book list for me to read in october";
+            notes.AddNote(contentThirdNote);
+
             notes.AllNotes[0].Name.ShouldContain("Book list");
             notes.AllNotes[0].Content.ShouldContain(contentFirstNote);
-            notes.AllNotes[1].Name.ShouldContain("Book list 2");
+            notes.AllNotes[1].Name.ShouldContain("Book list (2)");
             notes.AllNotes[1].Content.ShouldContain(contentSecondNote);
+            notes.AllNotes[2].Name.ShouldContain("Book list (3)");
+            notes.AllNotes[2].Content.ShouldContain(contentThirdNote);
         }
 
         [TestMethod]

@@ -154,7 +154,6 @@ namespace Notes
             note.Content.ShouldContain(contentSecondNote);
         }
 
-
         [TestMethod]
         public void ShouldGiveMessageAtRemoveIfNoteDoesNotExist()
         {
@@ -211,6 +210,32 @@ namespace Notes
                 notes.DisplayNotes();
                 stringWriter.ToString().ShouldContain(expected);
             }
+        }
+
+        [TestMethod]
+        public void ShouldLoadNotes()
+        {
+            int counter = 0;
+            var myFileContent = @"#Id:1
+#Name:magazin de
+#Content:magazin de mezeluri
+#Id:2
+#Name:name
+#Content:new\+content\+is given\+by";
+            var stream = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(myFileContent));
+            Notes notes = new Notes();
+            Note note = new Note();
+            notes.ParseFileContent(ref counter, stream);
+            note = GetCurrentEnumerator(notes, note);
+
+            note.Id.ShouldContain("1");
+            note.Name.ShouldContain("magazin de");
+            note.Content.ShouldContain("magazin de mezeluri");
+
+            note = GetCurrentEnumerator(notes, note, 1);
+            note.Id.ShouldContain("2");
+            note.Name.ShouldContain("name");
+            note.Content.ShouldContain(@"new\+content\+is given\+by");
         }
 
         private Note GetCurrentEnumerator(Notes notes, Note note, int position = 0)

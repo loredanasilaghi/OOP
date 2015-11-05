@@ -74,59 +74,72 @@ namespace Notes
 
         public void LoadNotes()
         {
-            string id = string.Empty;
-            string name = string.Empty;
-            string content = string.Empty;
-
-            string idKeyWord = "#Id:";
-            string nameKeyWord = "#Name:";
-            string contentKeyWord = "#Content:";
             Console.WriteLine("\n\tLoading file...");
             if (!File.Exists(path))
             {
                 Console.WriteLine("\tThe file does not exist. No notes loaded.");
                 return;
             };
-            string line;
-            int counter = 0;
-            System.IO.StreamReader file = new System.IO.StreamReader(path);
-            while ((line = file.ReadLine()) != null)
-            {
-                
-                if (line.StartsWith(idKeyWord))
-                {
-                    if (id != string.Empty)
-                    {
-                        Note note = new Note(id, name, content);
-                        allNotes.Add(note);
-                        counter++;
-                    }
 
-                    id = line.Substring(idKeyWord.Length);
-                }
-                else if (line.StartsWith(nameKeyWord))
-                {
-                    name = line.Substring(nameKeyWord.Length);
-                }
-                else if (line.StartsWith(contentKeyWord))
-                {
-                    content = line.Substring(contentKeyWord.Length);
-                }
-                else
-                {
-                    content += Environment.NewLine + line;
-                }
+            int counter = 0;
+            byte[] fileContent = File.ReadAllBytes(path);
+            MemoryStream stream = new MemoryStream(fileContent);
+            ParseFileContent(ref counter, stream);
+
+            Console.WriteLine("\tFile loaded. {0} notes read", counter);
+        }
+
+        public void ParseFileContent(ref int counter, MemoryStream file)
+        {
+            StreamReader stream = new StreamReader(file);
+            string id = string.Empty;
+            string name = string.Empty;
+            string content = string.Empty;
+
+            string line;
+
+            while ((line = stream.ReadLine()) != null)
+            {
+                ParseNote(ref id, ref name, ref content, line, ref counter);
             }
 
+            AddNoteAndIncreaseCounter(id, name, content, ref counter);
+            stream.Close();
+        }
+        
+        public void ParseNote(ref string id, ref string name, ref string content, string line, ref int counter)
+        {
+            string idKeyWord = "#Id:";
+            string nameKeyWord = "#Name:";
+            string contentKeyWord = "#Content:";
+
+            if (line.StartsWith(idKeyWord))
+            {
+                AddNoteAndIncreaseCounter(id, name, content, ref counter);
+                id = line.Substring(idKeyWord.Length);
+            }
+            else if (line.StartsWith(nameKeyWord))
+            {
+                name = line.Substring(nameKeyWord.Length);
+            }
+            else if (line.StartsWith(contentKeyWord))
+            {
+                content = line.Substring(contentKeyWord.Length);
+            }
+            else
+            {
+                content += Environment.NewLine + line;
+            }
+        }
+
+        public void AddNoteAndIncreaseCounter(string id, string name, string content, ref int counter)
+        {
             if (id != string.Empty)
             {
                 Note note = new Note(id, name, content);
                 allNotes.Add(note);
                 counter++;
             }
-            file.Close();
-
-            Console.WriteLine("\tFile loaded. {0} notes read", counter);
         }
 
         public void DisplayNotes()

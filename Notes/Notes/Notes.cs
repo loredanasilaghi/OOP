@@ -13,10 +13,9 @@ namespace Notes
         private List<Note> allNotes = new List<Note>();
         private string path = @"Notes.txt";
 
-        public List<Note> AllNotes
+        public  IEnumerable<Note> AllNotes
         {
             get { return allNotes; }
-            private set { allNotes = value; }
         }
 
         public void AddNote(string content, string name = "")
@@ -26,11 +25,18 @@ namespace Notes
             if (name == "")
             {
                 note.Name = GenerateNoteName(content);
-                note.Name = ChangeNoteNameIfAlreadyExists(note.Name);
             }
             else
                 note.Name = name;
-            note.Id = (allNotes.Count + 1).ToString();
+            if (allNotes.Count == 0)
+            {
+                note.Id = "1";
+            }
+            else
+            {
+                var lastElement = allNotes[allNotes.Count -1];
+                note.Id = (int.Parse(lastElement.Id) + 1).ToString();
+            }
             allNotes.Add(note);
         }
 
@@ -47,34 +53,8 @@ namespace Notes
             return name;
         }
 
-        public void RegenerateIds()
-        {
-            for (int i = 0; i < allNotes.Count(); i++)
-            {
-                allNotes[i].Id = (i + 1).ToString();
-            }
-        }
-
-        public string ChangeNoteNameIfAlreadyExists(string name)
-        {
-            int counter = 1;
-            for (int i = 0; i <= allNotes.Count - 1; i++)
-            {
-                if(allNotes[i].Name.IndexOf(name, 0, StringComparison.OrdinalIgnoreCase) != -1)
-                {
-                    counter++;
-                }
-            }
-            if (counter != 1)
-            {
-                name = string.Format("{0} ({1})", name, counter);
-            }
-            return name;
-        }
-
         public void RemoveNote(string id)
         {
-            
             bool found = false;
             for (int i = 0; i <= allNotes.Count - 1; i++)
             {
@@ -94,6 +74,13 @@ namespace Notes
 
         public void LoadNotes()
         {
+            string id = string.Empty;
+            string name = string.Empty;
+            string content = string.Empty;
+
+            string idKeyWord = "#Id:";
+            string nameKeyWord = "#Name:";
+            string contentKeyWord = "#Content:";
             Console.WriteLine("\n\tLoading file...");
             if (!File.Exists(path))
             {
@@ -105,11 +92,38 @@ namespace Notes
             System.IO.StreamReader file = new System.IO.StreamReader(path);
             while ((line = file.ReadLine()) != null)
             {
-                Note note = new Note(line);
+                
+                if (line.StartsWith(idKeyWord))
+                {
+                    if (id != string.Empty)
+                    {
+                        Note note = new Note(id, name, content);
+                        allNotes.Add(note);
+                        counter++;
+                    }
+
+                    id = line.Substring(idKeyWord.Length);
+                }
+                else if (line.StartsWith(nameKeyWord))
+                {
+                    name = line.Substring(nameKeyWord.Length);
+                }
+                else if (line.StartsWith(contentKeyWord))
+                {
+                    content = line.Substring(contentKeyWord.Length);
+                }
+                else
+                {
+                    content += Environment.NewLine + line;
+                }
+            }
+
+            if (id != string.Empty)
+            {
+                Note note = new Note(id, name, content);
                 allNotes.Add(note);
                 counter++;
             }
-            
             file.Close();
 
             Console.WriteLine("\tFile loaded. {0} notes read", counter);
@@ -120,9 +134,12 @@ namespace Notes
             Console.WriteLine("\n\tDisplaying notes...");
             for (int i = 0; i < allNotes.Count; i++)
             {
-                Console.WriteLine("\tId: {0}, Name: {1}, content: {2}", allNotes[i].Id, allNotes[i].Name, allNotes[i].Content);
+                Console.WriteLine("\tID: {0}", allNotes[i].Id);
+                Console.WriteLine("\tName: {0}", allNotes[i].Name);
+                allNotes[i].Content = ReplaceContent(allNotes[i].Content, "\\+", "\n" + "\t\t");
+                Console.WriteLine("\tContent: {0}", allNotes[i].Content);
             }
-            Console.WriteLine("\tEnd of list.");
+            Console.WriteLine("\n\tEnd of list.");
         }
 
         public void SaveNotes()
@@ -132,14 +149,20 @@ namespace Notes
             
             for (int i = 0; i < allNotes.Count; i++)
             {
-                file.Write("Id:\"" + allNotes[i].Id + "\"");
-                file.Write(" Name:\"" + allNotes[i].Name + "\"");
-                file.Write(" Content:\"" + allNotes[i].Content + "\"");
-                file.Write(file.NewLine);
+                file.WriteLine("#Id:" + allNotes[i].Id);
+                file.WriteLine("#Name:" + allNotes[i].Name);
+                allNotes[i].Content = ReplaceContent(allNotes[i].Content, "\n", "\\+");
+                file.WriteLine("#Content:" + allNotes[i].Content);
             }
 
             file.Close();
             Console.WriteLine("\tFile saved. {0} notes saved", allNotes.Count);
+        }
+
+        public string ReplaceContent(string content, string toBeReplaced, string toReplace)
+        {
+            content = content.Replace(toBeReplaced, toReplace);
+            return content;
         }
     }
 }

@@ -14,25 +14,37 @@ namespace Notes
         [TestMethod]
         public void ShouldAddNoteWithoutName()
         {
-            string content = "Book list for me to read";
+            string expectedContent = "Book list for me to read";
             string expectedName = "Book list";
-            Notes notes = new Notes();
-            notes.AddNote(content);
+            string expectedId = "1";
 
-            notes.AllNotes[0].Name.ShouldContain(expectedName);
-            notes.AllNotes[0].Content.ShouldContain(content);
+            Notes notes = new Notes();
+            notes.AddNote(expectedContent);
+
+            Note note = new Note();
+            note = GetCurrentEnumerator(notes, note);
+
+            note.Id.ShouldContain(expectedId);
+            note.Name.ShouldContain(expectedName);
+            note.Content.ShouldContain(expectedContent);
         }
 
         [TestMethod]
         public void ShouldAddNoteWithSingleWordContent()
         {
-            string content = "Book";
+            string expectedContent = "Book";
             string expectedName = "Book";
-            Notes notes = new Notes();
-            notes.AddNote(content);
+            string expectedId = "1";
 
-            notes.AllNotes[0].Name.ShouldContain(expectedName);
-            notes.AllNotes[0].Content.ShouldContain(content);
+            Notes notes = new Notes();
+            notes.AddNote(expectedContent);
+
+            Note note = new Note();
+            note = GetCurrentEnumerator(notes, note);
+
+            note.Id.ShouldContain(expectedId);
+            note.Name.ShouldContain(expectedName);
+            note.Content.ShouldContain(expectedContent);
         }
 
         [TestMethod]
@@ -40,34 +52,33 @@ namespace Notes
         {
             string content = "Book list for me to read";
             string name = "Book list";
+            string id = "1";
             Notes notes = new Notes();
             notes.AddNote(content, name);
 
-            notes.AllNotes[0].Name.ShouldContain(name);
-            notes.AllNotes[0].Content.ShouldContain(content);
+            Note note = new Note();
+            note = GetCurrentEnumerator(notes, note);
+
+            note.Id.ShouldContain(id);
+            note.Name.ShouldContain(name);
+            note.Content.ShouldContain(content);
         }
 
-
-
         [TestMethod]
-        public void ShouldAddNoteWithAlmostTheSameContent()
+        public void ShouldAddMultiline()
         {
-            string contentFirstNote = "Book list for me to read in november";
+            string content = @"Book list\r\n\tfor me\r\n\tto\r\n\tread";
+            string name = "Book list";
+            string id = "1";
             Notes notes = new Notes();
-            notes.AddNote(contentFirstNote);
+            notes.AddNote(content, name);
 
-            string contentSecondNote = "Book list for me to read in december";
-            notes.AddNote(contentSecondNote);
-            
-            string contentThirdNote = "Book list for me to read in october";
-            notes.AddNote(contentThirdNote);
+            Note note = new Note();
+            note = GetCurrentEnumerator(notes, note);
 
-            notes.AllNotes[0].Name.ShouldContain("Book list");
-            notes.AllNotes[0].Content.ShouldContain(contentFirstNote);
-            notes.AllNotes[1].Name.ShouldContain("Book list (2)");
-            notes.AllNotes[1].Content.ShouldContain(contentSecondNote);
-            notes.AllNotes[2].Name.ShouldContain("Book list (3)");
-            notes.AllNotes[2].Content.ShouldContain(contentThirdNote);
+            note.Id.ShouldContain(id);
+            note.Name.ShouldContain(name);
+            note.Content.ShouldContain(content);
         }
 
         [TestMethod]
@@ -76,7 +87,7 @@ namespace Notes
             string content = "Book list for me to read";
             Notes notes = new Notes();
             notes.AddNote(content);
-            
+
             notes.RemoveNote("1");
 
             notes.AllNotes.ShouldBeEmpty();
@@ -89,6 +100,33 @@ namespace Notes
             Notes notes = new Notes();
             notes.AddNote(contentFirstNote);
 
+            string contentSecondNote = "Book list2 for me to read in december";
+            notes.AddNote(contentSecondNote);
+
+            string contentThirdNote = "Book list3 for me to read in october";
+            notes.AddNote(contentThirdNote);
+
+            notes.RemoveNote("2");
+
+            Note note = new Note();
+            note = GetCurrentEnumerator(notes, note);
+            note.Id.ShouldContain("1");
+            note.Name.ShouldContain("Book list");
+            note.Content.ShouldContain(contentFirstNote);
+            
+            note = GetCurrentEnumerator(notes, note, 1);
+            note.Id.ShouldContain("3");
+            note.Name.ShouldContain("Book list");
+            note.Content.ShouldContain(contentThirdNote);
+        }
+
+        [TestMethod]
+        public void ShouldAddNewNoteAfterDelete()
+        {
+            string contentFirstNote = "Book list for me to read in november";
+            Notes notes = new Notes();
+            notes.AddNote(contentFirstNote);
+
             string contentSecondNote = "Book list for me to read in december";
             notes.AddNote(contentSecondNote);
 
@@ -96,13 +134,26 @@ namespace Notes
             notes.AddNote(contentThirdNote);
 
             notes.RemoveNote("2");
+            
+            notes.AddNote(contentSecondNote);
 
-            notes.AllNotes[0].Name.ShouldContain("Book list");
-            notes.AllNotes[0].Content.ShouldContain(contentFirstNote);
-
-            notes.AllNotes[1].Name.ShouldContain("Book list (3)");
-            notes.AllNotes[1].Content.ShouldContain(contentThirdNote);
+            Note note = new Note();
+            note = GetCurrentEnumerator(notes, note);
+            note.Id.ShouldContain("1");
+            note.Name.ShouldContain("Book list");
+            note.Content.ShouldContain(contentFirstNote);
+            
+            note = GetCurrentEnumerator(notes, note, 1);
+            note.Id.ShouldContain("3");
+            note.Name.ShouldContain("Book list");
+            note.Content.ShouldContain(contentThirdNote);
+            
+            note = GetCurrentEnumerator(notes, note, 2);
+            note.Id.ShouldContain("4");
+            note.Name.ShouldContain("Book list");
+            note.Content.ShouldContain(contentSecondNote);
         }
+
 
         [TestMethod]
         public void ShouldGiveMessageAtRemoveIfNoteDoesNotExist()
@@ -129,14 +180,13 @@ namespace Notes
             Notes notes = new Notes();
             notes.AllNotes.ShouldBeEmpty();
             notes.AddNote(content);
-
-            string expected = "\n\tDisplaying notes...\r\n\tId: 1, Name: Book list, content: Book list for me to read\r\n\tEnd of list.\r\n";
+            string expected = "\n\tDisplaying notes...\r\n\tID: 1\r\n\tName: Book list\r\n\tContent: Book list for me to read\r\n\n\tEnd of list.\r\n";
             using (StringWriter stringWriter = new StringWriter())
             {
                 Console.SetOut(stringWriter);
                 expected.ShouldNotBeSameAs(stringWriter.ToString());
                 notes.DisplayNotes();
-                expected.ShouldContain(stringWriter.ToString());
+                stringWriter.ToString().ShouldContain(expected);
             }
         }
 
@@ -148,12 +198,12 @@ namespace Notes
             Notes notes = new Notes();
             notes.AllNotes.ShouldBeEmpty();
             notes.AddNote(contentFirstNote);
-            
+
             string contentSecondNote = "Shopping list for this week";
 
             notes.AddNote(contentSecondNote);
 
-            string expected = "\n\tDisplaying notes...\r\n\tId: 1, Name: Book list, content: Book list for me to read\r\n\tId: 2, Name: Shopping list, content: Shopping list for this week\r\n\tEnd of list.\r\n";
+            string expected = "\n\tDisplaying notes...\r\n\tID: 1\r\n\tName: Book list\r\n\tContent: Book list for me to read\r\n\tID: 2\r\n\tName: Shopping list\r\n\tContent: Shopping list for this week\r\n\n\tEnd of list.\r\n";
             using (StringWriter stringWriter = new StringWriter())
             {
                 Console.SetOut(stringWriter);
@@ -163,18 +213,17 @@ namespace Notes
             }
         }
 
-        [TestMethod]
-        public void ShouldPrelucrateNote()
+        private Note GetCurrentEnumerator(Notes notes, Note note, int position = 0)
         {
-            string exectedId = "1";
-            string expectedName = "Textul este";
-            string expectedContent = "Textul este o succesiune ordonată de cuvinte, propoziţii, fraze prin care ni se comunică idei";
-            string initial = "Id:\""+ exectedId + "\", Name:\""+ expectedName + "\" Content:\""+ expectedContent+"\"";
-
-            Note note = new Note(initial);
-            note.Id.ShouldContain(exectedId);
-            note.Name.ShouldContain(expectedName);
-            note.Content.ShouldContain(expectedContent);
+            using (IEnumerator<Note> enumer = notes.AllNotes.GetEnumerator())
+            {
+                for (int i = 1; i <= position; i++)
+                {
+                    enumer.MoveNext();
+                }
+                if (enumer.MoveNext()) note = enumer.Current;
+            }
+            return note;
         }
     }
 }

@@ -32,26 +32,11 @@ namespace Notes
 
         public Note() { }
 
-        public Note(string line)
+        public Note(string id, string name, string content)
         {
-            string idKeyWord = "Id:";
-            string nameKeyWord = "Name:";
-            string contentKeyWord = "Content:";
-            int positionId = line.IndexOf(idKeyWord);
-            int positionName = line.IndexOf(nameKeyWord);
-            int positionContent = line.IndexOf(contentKeyWord);
-            
-            int startPosition = positionId + idKeyWord.Length + 1;
-            int endPosition = positionName - 2;
-            id = line.Substring(startPosition, endPosition - startPosition);
-
-            startPosition = positionName + nameKeyWord.Length + 1;
-            endPosition = positionContent - 2;
-            name = line.Substring(startPosition, endPosition -startPosition);
-            
-            startPosition = positionContent + contentKeyWord.Length + 1;
-            endPosition = line.Length - 1;
-            content = line.Substring(startPosition, endPosition - startPosition);
+            Id = id;
+            Name = name;
+            Content = content;
         }
     }
 }

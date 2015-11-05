@@ -66,7 +66,6 @@ namespace Notes
                         {
                             string id = args[1];
                             notes.RemoveNote(id);
-                            notes.RegenerateIds();
                             notes.SaveNotes();
                         }
                         else

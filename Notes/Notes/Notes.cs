@@ -84,12 +84,12 @@ namespace Notes
             int counter = 0;
             byte[] fileContent = File.ReadAllBytes(path);
             MemoryStream stream = new MemoryStream(fileContent);
-            ParseFileContent(ref counter, stream);
+            ProcessFileContent(ref counter, stream);
 
             Console.WriteLine("\tFile loaded. {0} notes read", counter);
         }
 
-        public void ParseFileContent(ref int counter, MemoryStream file)
+        public void ProcessFileContent(ref int counter, MemoryStream file)
         {
             StreamReader stream = new StreamReader(file);
             string id = string.Empty;
@@ -100,14 +100,14 @@ namespace Notes
 
             while ((line = stream.ReadLine()) != null)
             {
-                ParseNote(ref id, ref name, ref content, line, ref counter);
+                ProcessLine(ref id, ref name, ref content, line, ref counter);
             }
 
             AddNoteAndIncreaseCounter(id, name, content, ref counter);
             stream.Close();
         }
         
-        public void ParseNote(ref string id, ref string name, ref string content, string line, ref int counter)
+        public void ProcessLine(ref string id, ref string name, ref string content, string line, ref int counter)
         {
             string idKeyWord = "#Id:";
             string nameKeyWord = "#Name:";

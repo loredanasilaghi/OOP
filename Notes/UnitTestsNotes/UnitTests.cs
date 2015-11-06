@@ -22,7 +22,7 @@ namespace Notes
             notes.AddNote(expectedContent);
 
             Note note = new Note();
-            note = GetCurrentEnumerator(notes, note);
+            note = GetCurrentEnumerator(notes);
 
             note.Id.ShouldContain(expectedId);
             note.Name.ShouldContain(expectedName);
@@ -40,7 +40,7 @@ namespace Notes
             notes.AddNote(expectedContent);
 
             Note note = new Note();
-            note = GetCurrentEnumerator(notes, note);
+            note = GetCurrentEnumerator(notes);
 
             note.Id.ShouldContain(expectedId);
             note.Name.ShouldContain(expectedName);
@@ -57,7 +57,7 @@ namespace Notes
             notes.AddNote(content, name);
 
             Note note = new Note();
-            note = GetCurrentEnumerator(notes, note);
+            note = GetCurrentEnumerator(notes);
 
             note.Id.ShouldContain(id);
             note.Name.ShouldContain(name);
@@ -74,7 +74,7 @@ namespace Notes
             notes.AddNote(content, name);
 
             Note note = new Note();
-            note = GetCurrentEnumerator(notes, note);
+            note = GetCurrentEnumerator(notes);
 
             note.Id.ShouldContain(id);
             note.Name.ShouldContain(name);
@@ -109,12 +109,12 @@ namespace Notes
             notes.RemoveNote("2");
 
             Note note = new Note();
-            note = GetCurrentEnumerator(notes, note);
+            note = GetCurrentEnumerator(notes);
             note.Id.ShouldContain("1");
             note.Name.ShouldContain("Book list");
             note.Content.ShouldContain(contentFirstNote);
             
-            note = GetCurrentEnumerator(notes, note, 1);
+            note = GetCurrentEnumerator(notes, 1);
             note.Id.ShouldContain("3");
             note.Name.ShouldContain("Book list");
             note.Content.ShouldContain(contentThirdNote);
@@ -138,17 +138,17 @@ namespace Notes
             notes.AddNote(contentSecondNote);
 
             Note note = new Note();
-            note = GetCurrentEnumerator(notes, note);
+            note = GetCurrentEnumerator(notes);
             note.Id.ShouldContain("1");
             note.Name.ShouldContain("Book list");
             note.Content.ShouldContain(contentFirstNote);
             
-            note = GetCurrentEnumerator(notes, note, 1);
+            note = GetCurrentEnumerator(notes, 1);
             note.Id.ShouldContain("3");
             note.Name.ShouldContain("Book list");
             note.Content.ShouldContain(contentThirdNote);
             
-            note = GetCurrentEnumerator(notes, note, 2);
+            note = GetCurrentEnumerator(notes, 2);
             note.Id.ShouldContain("4");
             note.Name.ShouldContain("Book list");
             note.Content.ShouldContain(contentSecondNote);
@@ -213,7 +213,7 @@ namespace Notes
         }
 
         [TestMethod]
-        public void ShouldLoadNotes()
+        public void ShouldProcessNotes()
         {
             int counter = 0;
             var myFileContent = @"#Id:1
@@ -225,21 +225,22 @@ namespace Notes
             var stream = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(myFileContent));
             Notes notes = new Notes();
             Note note = new Note();
-            notes.ParseFileContent(ref counter, stream);
-            note = GetCurrentEnumerator(notes, note);
+            notes.ProcessFileContent(ref counter, stream);
+            note = GetCurrentEnumerator(notes);
 
             note.Id.ShouldContain("1");
             note.Name.ShouldContain("magazin de");
             note.Content.ShouldContain("magazin de mezeluri");
 
-            note = GetCurrentEnumerator(notes, note, 1);
+            note = GetCurrentEnumerator(notes, 1);
             note.Id.ShouldContain("2");
             note.Name.ShouldContain("name");
             note.Content.ShouldContain(@"new\+content\+is given\+by");
         }
 
-        private Note GetCurrentEnumerator(Notes notes, Note note, int position = 0)
+        private Note GetCurrentEnumerator(Notes notes, int position = 0)
         {
+            Note note = new Note();
             using (IEnumerator<Note> enumer = notes.AllNotes.GetEnumerator())
             {
                 for (int i = 1; i <= position; i++)

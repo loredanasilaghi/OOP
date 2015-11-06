@@ -142,6 +142,48 @@ namespace Notes
             }
         }
 
+        public void ExportNotesToHtml(string path)
+        {
+            path += ".html";
+            Console.WriteLine("\n\tExporting file...");
+            string html = CreateHtmlFile();
+            System.IO.File.WriteAllText(path, html);
+
+            System.Diagnostics.Process.Start(path);
+        }
+
+        public string CreateHtmlFile()
+        {
+            string html;
+            string htmlStart = @"<!DOCTYPE html>
+<html>
+<head>
+<title>Notes List</title>
+</head>
+ 
+<body>
+ 
+ <h1> Notes list</h1>
+    
+";
+            string htmlEnd = @" 
+ </body>
+</html> ";
+
+            html = htmlStart;
+            foreach (Note note in AllNotes)
+            {
+                html += "<p>Id: " + note.Id + "</p>\n";
+                html += "<p>Name: " + note.Name + "</p>\n";
+                note.Content = ReplaceContent(note.Content, "\\+", "<br/>");
+                html += "<p>Content: " + note.Content + "</p>\n";
+                html += "<br/>";
+            }
+            html += htmlEnd;
+
+            return html;
+        }
+
         public void DisplayNotes()
         {
             Console.WriteLine("\n\tDisplaying notes...");

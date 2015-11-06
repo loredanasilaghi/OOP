@@ -24,6 +24,7 @@ namespace Notes
                 Console.WriteLine("\t\t-add <content>");
                 Console.WriteLine("\t\t-delete <ID>");
                 Console.WriteLine("\t\t-list");
+                Console.WriteLine("\t\t-export <path>");
                 return 1;
             }
 
@@ -58,6 +59,21 @@ namespace Notes
                 case "-list":
                     {
                         notes.DisplayNotes();
+                        break;
+                    }
+
+                case "-export":
+                    {
+                        if (args.Length == 2)
+                        {
+                            string path = args[1];
+                            notes.ExportNotesToHtml(path);
+                        }
+                        else
+                        {
+                            InvalidCommand();
+                            return -1;
+                        }
                         break;
                     }
                 case "-delete":

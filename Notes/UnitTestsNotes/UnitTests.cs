@@ -238,6 +238,35 @@ namespace Notes
             note.Content.ShouldContain(@"new\+content\+is given\+by");
         }
 
+        [TestMethod]
+        public void ShouldCreateHtmlContent()
+        {
+            Notes notes = new Notes();
+            notes.AddNote("Shopping list for today");
+            notes.AddNote(@"new\+content\+is given\+by", "content");
+            string actualHtmlContent = notes.CreateHtmlFile();
+            string expectedHtmlContent = @"<!DOCTYPE html>
+<html>
+<head>
+<title>Notes List</title>
+</head>
+
+<body>
+
+<h1>Notes list</h1>
+
+<p>Id: 1</p>
+<p>Name: Shopping list</p>
+<p>Content: Shopping list for today</p>
+<br/><p>Id: 2</p>
+<p>Name: content</p>
+<p>Content: new<br/>content<br/>is given<br/>by</p>
+<br/>
+</body>
+</html>";
+            actualHtmlContent.ShouldBeSameAs(expectedHtmlContent);
+        }
+
         private Note GetCurrentEnumerator(Notes notes, int position = 0)
         {
             Note note = new Note();

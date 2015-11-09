@@ -160,15 +160,15 @@ namespace Notes
 <head>
 <title>Notes List</title>
 </head>
- 
+
 <body>
- 
- <h1> Notes list</h1>
-    
+
+<h1>Notes list</h1>
+
 ";
-            string htmlEnd = @" 
- </body>
-</html> ";
+            string htmlEnd = @"
+</body>
+</html>";
 
             html = htmlStart;
             foreach (Note note in AllNotes)

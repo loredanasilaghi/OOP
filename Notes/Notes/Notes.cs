@@ -144,11 +144,13 @@ namespace Notes
 
         public void ExportNotesToHtml(string path)
         {
-            path += ".html";
+            if(!path.Contains(".html"))
+                path += ".html";
             Console.WriteLine("\n\tExporting file...");
+            DisposableResourceHolder resource = new DisposableResourceHolder();
             string html = CreateHtmlFile();
             System.IO.File.WriteAllText(path, html);
-
+            resource.Dispose();
             System.Diagnostics.Process.Start(path);
         }
 
@@ -173,10 +175,10 @@ namespace Notes
             html = htmlStart;
             foreach (Note note in AllNotes)
             {
-                html += "<p>Id: " + note.Id + "</p>\n";
-                html += "<p>Name: " + note.Name + "</p>\n";
+                html += "<p>Id: " + note.Id + "</p>\r\n";
+                html += "<p>Name: " + note.Name + "</p>\r\n";
                 note.Content = ReplaceContent(note.Content, "\\+", "<br/>");
-                html += "<p>Content: " + note.Content + "</p>\n";
+                html += "<p>Content: " + note.Content + "</p>\r\n";
                 html += "<br/>";
             }
             html += htmlEnd;
@@ -201,7 +203,6 @@ namespace Notes
         {
             Console.WriteLine("\n\tSaving file...");
             StreamWriter file = new StreamWriter(path, false, Encoding.UTF8);
-            
             for (int i = 0; i < allNotes.Count; i++)
             {
                 file.WriteLine("#Id:" + allNotes[i].Id);
@@ -209,8 +210,6 @@ namespace Notes
                 allNotes[i].Content = ReplaceContent(allNotes[i].Content, "\n", "\\+");
                 file.WriteLine("#Content:" + allNotes[i].Content);
             }
-
-            file.Close();
             Console.WriteLine("\tFile saved. {0} notes saved", allNotes.Count);
         }
 

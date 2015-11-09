@@ -264,7 +264,7 @@ namespace Notes
 <br/>
 </body>
 </html>";
-            actualHtmlContent.ShouldBeSameAs(expectedHtmlContent);
+            actualHtmlContent.ShouldContain(expectedHtmlContent);
         }
 
         private Note GetCurrentEnumerator(Notes notes, int position = 0)

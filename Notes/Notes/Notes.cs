@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,14 +9,38 @@ using System.Threading.Tasks;
 
 namespace Notes
 {
-    public class Notes
+    public class Notes: IEnumerable<Note>
     {
-        private List<Note> allNotes = new List<Note>();
-        private string path = @"Notes.txt";
+        private List<Note> allNotesList = new List<Note>();
 
         public  IEnumerable<Note> AllNotes
         {
-            get { return allNotes; }
+            get { return allNotesList; }
+        }
+
+        public IEnumerator<Note> GetEnumerator()
+        {
+            return allNotesList.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        public int Length
+        {
+            get { return allNotesList.Count(); }
+        }
+
+        public Notes()
+        {
+            allNotesList = new List<Note>();
+        }
+
+        public Notes(List<Note> list)
+        {
+            allNotesList = list;
         }
 
         public void AddNote(string content, string name = "")
@@ -28,16 +53,16 @@ namespace Notes
             }
             else
                 note.Name = name;
-            if (allNotes.Count == 0)
+            if (allNotesList.Count == 0)
             {
                 note.Id = "1";
             }
             else
             {
-                var lastElement = allNotes[allNotes.Count -1];
+                var lastElement = allNotesList[allNotesList.Count -1];
                 note.Id = (int.Parse(lastElement.Id) + 1).ToString();
             }
-            allNotes.Add(note);
+            allNotesList.Add(note);
         }
 
         public string GenerateNoteName(string content)
@@ -56,12 +81,12 @@ namespace Notes
         public void RemoveNote(string id)
         {
             bool found = false;
-            for (int i = 0; i <= allNotes.Count - 1; i++)
+            for (int i = 0; i <= allNotesList.Count - 1; i++)
             {
-                if (String.Equals(allNotes[i].Id, id) == true)
+                if (String.Equals(allNotesList[i].Id, id) == true)
                 {
                     found = true;
-                    allNotes.RemoveAt(i);
+                    allNotesList.RemoveAt(i);
                     break;
                 }
             }
@@ -71,149 +96,21 @@ namespace Notes
                 Console.WriteLine("\tID invalid. There is no note with this ID.");
             }
         }
-
-        public void LoadNotes()
-        {
-            Console.WriteLine("\n\tLoading file...");
-            if (!File.Exists(path))
-            {
-                Console.WriteLine("\tThe file does not exist. No notes loaded.");
-                return;
-            };
-
-            int counter = 0;
-            byte[] fileContent = File.ReadAllBytes(path);
-            MemoryStream stream = new MemoryStream(fileContent);
-            ProcessFileContent(ref counter, stream);
-
-            Console.WriteLine("\tFile loaded. {0} notes read", counter);
-        }
-
-        public void ProcessFileContent(ref int counter, MemoryStream file)
-        {
-            StreamReader stream = new StreamReader(file);
-            string id = string.Empty;
-            string name = string.Empty;
-            string content = string.Empty;
-
-            string line;
-
-            while ((line = stream.ReadLine()) != null)
-            {
-                ProcessLine(ref id, ref name, ref content, line, ref counter);
-            }
-
-            AddNoteAndIncreaseCounter(id, name, content, ref counter);
-            stream.Close();
-        }
         
-        public void ProcessLine(ref string id, ref string name, ref string content, string line, ref int counter)
-        {
-            string idKeyWord = "#Id:";
-            string nameKeyWord = "#Name:";
-            string contentKeyWord = "#Content:";
-
-            if (line.StartsWith(idKeyWord))
-            {
-                AddNoteAndIncreaseCounter(id, name, content, ref counter);
-                id = line.Substring(idKeyWord.Length);
-            }
-            else if (line.StartsWith(nameKeyWord))
-            {
-                name = line.Substring(nameKeyWord.Length);
-            }
-            else if (line.StartsWith(contentKeyWord))
-            {
-                content = line.Substring(contentKeyWord.Length);
-            }
-            else
-            {
-                content += Environment.NewLine + line;
-            }
-        }
-
-        public void AddNoteAndIncreaseCounter(string id, string name, string content, ref int counter)
-        {
-            if (id != string.Empty)
-            {
-                Note note = new Note(id, name, content);
-                allNotes.Add(note);
-                counter++;
-            }
-        }
-
-        public void ExportNotesToHtml(string path)
-        {
-            if(!path.Contains(".html"))
-                path += ".html";
-            Console.WriteLine("\n\tExporting file...");
-            DisposableResourceHolder resource = new DisposableResourceHolder();
-            string html = CreateHtmlFile();
-            System.IO.File.WriteAllText(path, html);
-            resource.Dispose();
-            System.Diagnostics.Process.Start(path);
-        }
-
-        public string CreateHtmlFile()
-        {
-            string html;
-            string htmlStart = @"<!DOCTYPE html>
-<html>
-<head>
-<title>Notes List</title>
-</head>
-
-<body>
-
-<h1>Notes list</h1>
-
-";
-            string htmlEnd = @"
-</body>
-</html>";
-
-            html = htmlStart;
-            foreach (Note note in AllNotes)
-            {
-                html += "<p>Id: " + note.Id + "</p>\r\n";
-                html += "<p>Name: " + note.Name + "</p>\r\n";
-                note.Content = ReplaceContent(note.Content, "\\+", "<br/>");
-                html += "<p>Content: " + note.Content + "</p>\r\n";
-                html += "<br/>";
-            }
-            html += htmlEnd;
-
-            return html;
-        }
-
         public void DisplayNotes()
         {
             Console.WriteLine("\n\tDisplaying notes...");
-            for (int i = 0; i < allNotes.Count; i++)
+            for (int i = 0; i < allNotesList.Count; i++)
             {
-                Console.WriteLine("\tID: {0}", allNotes[i].Id);
-                Console.WriteLine("\tName: {0}", allNotes[i].Name);
-                allNotes[i].Content = ReplaceContent(allNotes[i].Content, "\\+", "\n" + "\t\t");
-                Console.WriteLine("\tContent: {0}", allNotes[i].Content);
+                Console.WriteLine("\tID: {0}", allNotesList[i].Id);
+                Console.WriteLine("\tName: {0}", allNotesList[i].Name);
+                allNotesList[i].Content = ReplaceContent(allNotesList[i].Content, "\\+", "\n" + "\t\t");
+                Console.WriteLine("\tContent: {0}", allNotesList[i].Content);
             }
             Console.WriteLine("\n\tEnd of list.");
         }
 
-        public void SaveNotes()
-        {
-            Console.WriteLine("\n\tSaving file...");
-            StreamWriter file = new StreamWriter(path, false, Encoding.UTF8);
-            for (int i = 0; i < allNotes.Count; i++)
-            {
-                file.WriteLine("#Id:" + allNotes[i].Id);
-                file.WriteLine("#Name:" + allNotes[i].Name);
-                allNotes[i].Content = ReplaceContent(allNotes[i].Content, "\n", "\\+");
-                file.WriteLine("#Content:" + allNotes[i].Content);
-            }
-            Console.WriteLine("\tFile saved. {0} notes saved", allNotes.Count);
-        }
-
-        public string ReplaceContent(string content, string toBeReplaced, string toReplace)
+        public static string ReplaceContent(string content, string toBeReplaced, string toReplace)
         {
             content = content.Replace(toBeReplaced, toReplace);
             return content;

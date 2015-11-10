@@ -29,8 +29,9 @@ namespace Notes
             }
 
             Notes notes = new Notes();
-
-            notes.LoadNotes();
+            TxtFile txt = new TxtFile();
+            ExportHtml html = new ExportHtml();
+            notes = txt.LoadNotes();
 
             switch (args[0])
             {
@@ -40,14 +41,14 @@ namespace Notes
                         {
                             string content = args[1];
                             notes.AddNote(content);
-                            notes.SaveNotes();
+                            txt.SaveNotes(notes);
                         }
                         else if (args.Length == 3)
                         {
                             string name = args[1];
                             string content = args[2];
                             notes.AddNote(name, content);
-                            notes.SaveNotes();
+                            txt.SaveNotes(notes);
                         }
                         else
                         {
@@ -67,7 +68,7 @@ namespace Notes
                         if (args.Length == 2)
                         {
                             string path = args[1];
-                            notes.ExportNotesToHtml(path);
+                            html.ExportNotesToHtml(path, notes);
                         }
                         else
                         {
@@ -82,7 +83,7 @@ namespace Notes
                         {
                             string id = args[1];
                             notes.RemoveNote(id);
-                            notes.SaveNotes();
+                            txt.SaveNotes(notes);
                         }
                         else
                         {

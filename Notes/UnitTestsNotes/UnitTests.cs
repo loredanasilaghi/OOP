@@ -223,19 +223,20 @@ namespace Notes
 #Name:name
 #Content:new\+content\+is given\+by";
             var stream = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(myFileContent));
-            Notes notes = new Notes();
-            Note note = new Note();
-            notes.ProcessFileContent(ref counter, stream);
-            note = GetCurrentEnumerator(notes);
+            //Notes notes = new Notes();
+            TxtFile file = new TxtFile();
+            //Note note = new Note();
+            file.ProcessFileContent(ref counter, stream);
+            var notes = file.GetList();
+            //note = GetCurrentEnumerator(notes);
 
-            note.Id.ShouldContain("1");
-            note.Name.ShouldContain("magazin de");
-            note.Content.ShouldContain("magazin de mezeluri");
+            notes[0].Id.ShouldContain("1");
+            notes[0].Name.ShouldContain("magazin de");
+            notes[0].Content.ShouldContain("magazin de mezeluri");
 
-            note = GetCurrentEnumerator(notes, 1);
-            note.Id.ShouldContain("2");
-            note.Name.ShouldContain("name");
-            note.Content.ShouldContain(@"new\+content\+is given\+by");
+            notes[1].Id.ShouldContain("2");
+            notes[1].Name.ShouldContain("name");
+            notes[1].Content.ShouldContain(@"new\+content\+is given\+by");
         }
 
         [TestMethod]
@@ -244,7 +245,8 @@ namespace Notes
             Notes notes = new Notes();
             notes.AddNote("Shopping list for today");
             notes.AddNote(@"new\+content\+is given\+by", "content");
-            string actualHtmlContent = notes.CreateHtmlFile();
+            ExportHtml html = new ExportHtml();
+            string actualHtmlContent = html.CreateHtmlFile(notes);
             string expectedHtmlContent = @"<!DOCTYPE html>
 <html>
 <head>

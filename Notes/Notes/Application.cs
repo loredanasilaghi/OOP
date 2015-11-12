@@ -30,7 +30,6 @@ namespace Notes
 
             Notes notes = new Notes();
             TxtFile txt = new TxtFile();
-            ExportHtml html = new ExportHtml();
             notes = txt.LoadNotes();
 
             switch (args[0])
@@ -63,12 +62,35 @@ namespace Notes
                         break;
                     }
 
+                case "-search":
+                    {
+                        if (args.Length == 2)
+                        {
+                            string word = args[1];
+                            notes.SearchNotes(word);
+                            notes.DisplayNotes();
+                        }
+                        else if (args.Length == 4 && args[2] =="-export")
+                        {
+                            string word = args[1];
+                            string path = args[3];
+                            notes.SearchNotes(word);
+                            notes.ExportNotesToHtml(path, notes);
+                        }
+                        else
+                        {
+                            InvalidCommand();
+                            return -1;
+                        }
+                        break;
+                    }
+
                 case "-export":
                     {
                         if (args.Length == 2)
                         {
                             string path = args[1];
-                            html.ExportNotesToHtml(path, notes);
+                            notes.ExportNotesToHtml(path, notes);
                         }
                         else
                         {

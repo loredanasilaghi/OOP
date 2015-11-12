@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -42,8 +43,8 @@ namespace Notes
         {
             allNotesList = list;
         }
-
-        public void AddNote(string content, string name = "")
+    
+        public void AddNote(string content, string name="")
         {
             Note note = new Note();
             note.Content = content;
@@ -110,10 +111,38 @@ namespace Notes
             Console.WriteLine("\n\tEnd of list.");
         }
 
+        public void ExportNotesToHtml(string path, Notes notesList)
+        {
+            if (!path.Contains(".html"))
+                path += ".html";
+            Console.WriteLine("\n\tExporting file...");
+            HtmlDocument htmlDoc = new HtmlDocument();
+            string html = htmlDoc.CreateHtmlDocument(notesList);
+            System.IO.File.WriteAllText(path, html);
+            System.Diagnostics.Process.Start(path);
+        }
+
+        public void SearchNotes(string word)
+        {
+            List<Note> notesToRemove = new List<Note>();
+            foreach (var note in allNotesList)
+            {
+                if (!note.Name.Contains(word) && (!note.Content.Contains(word)))
+                {
+                    notesToRemove.Add(note);
+                }
+            }
+            for (int i = 0; i < notesToRemove.Count; i++)
+            {
+                allNotesList.Remove(notesToRemove[i]);
+            }
+        }
+        
         public static string ReplaceContent(string content, string toBeReplaced, string toReplace)
         {
             content = content.Replace(toBeReplaced, toReplace);
             return content;
         }
+        
     }
 }

@@ -23,8 +23,8 @@ namespace Notes
 
             int counter = 0;
             byte[] fileContent = File.ReadAllBytes(path);
-            MemoryStream stream = new MemoryStream(fileContent);
-            ProcessFileContent(ref counter, stream);
+            using (MemoryStream stream = new MemoryStream(fileContent))
+            { ProcessFileContent(ref counter, stream); }
 
             Notes notes = new Notes(noteList);
             Console.WriteLine("\tFile loaded. {0} notes read", counter);
@@ -87,16 +87,18 @@ namespace Notes
         public void SaveNotes(Notes notesList)
         {
             Console.WriteLine("\n\tSaving file...");
-            StreamWriter file = new StreamWriter(path, false, Encoding.UTF8);
-            foreach(var note in notesList)
+            using (StreamWriter file = new StreamWriter(path, false, Encoding.UTF8))
             {
-                file.WriteLine("#Id:" + note.Id);
-                file.WriteLine("#Name:" + note.Name);
-                note.Content = ReplaceContent(note.Content, "\n", "\\+");
-                file.WriteLine("#Content:" + note.Content);
+                foreach (var note in notesList)
+                {
+                    file.WriteLine("#Id:" + note.Id);
+                    file.WriteLine("#Name:" + note.Name);
+                    note.Content = ReplaceContent(note.Content, "\n", "\\+");
+                    file.WriteLine("#Content:" + note.Content);
+                }
+                Console.WriteLine("\tFile saved.");
+                file.Close();
             }
-            Console.WriteLine("\tFile saved.");
-            file.Close();
         }
 
         public string ReplaceContent(string content, string toBeReplaced, string toReplace)

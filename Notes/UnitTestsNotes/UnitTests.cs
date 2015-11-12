@@ -223,12 +223,9 @@ namespace Notes
 #Name:name
 #Content:new\+content\+is given\+by";
             var stream = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(myFileContent));
-            //Notes notes = new Notes();
             TxtFile file = new TxtFile();
-            //Note note = new Note();
             file.ProcessFileContent(ref counter, stream);
             var notes = file.GetList();
-            //note = GetCurrentEnumerator(notes);
 
             notes[0].Id.ShouldContain("1");
             notes[0].Name.ShouldContain("magazin de");
@@ -245,28 +242,48 @@ namespace Notes
             Notes notes = new Notes();
             notes.AddNote("Shopping list for today");
             notes.AddNote(@"new\+content\+is given\+by", "content");
-            ExportHtml html = new ExportHtml();
-            string actualHtmlContent = html.CreateHtmlFile(notes);
-            string expectedHtmlContent = @"<!DOCTYPE html>
-<html>
-<head>
-<title>Notes List</title>
-</head>
-
-<body>
-
-<h1>Notes list</h1>
-
-<p>Id: 1</p>
-<p>Name: Shopping list</p>
-<p>Content: Shopping list for today</p>
-<br/><p>Id: 2</p>
-<p>Name: content</p>
-<p>Content: new<br/>content<br/>is given<br/>by</p>
-<br/>
-</body>
-</html>";
+            HtmlDocument html = new HtmlDocument();
+            string actualHtmlContent = html.CreateHtmlDocument(notes);
+            string expectedHtmlContent = "<html>\r\n\t<head>\r\n\t\t<title>\r\n\t\t\tNotesList\r\n\t\t</title>\r\n\t</head><body>\r\n\t\t<h1>\r\n\t\t\tNotesList\r\n\t\t</h1><p>Id: 1\r\n</p><p>Name: Shopping list\r\n</p><p>Content: Shopping list for today\r\n\r\n</p><p>Id: 2\r\n</p><p>Name: content\r\n</p><p>Content: new&lt;br/&gt;content&lt;br/&gt;is given&lt;br/&gt;by\r\n\r\n</p>\r\n\t</body>\r\n</html>";
             actualHtmlContent.ShouldContain(expectedHtmlContent);
+        }
+
+        [TestMethod]
+        public void ShouldReturnASingleMatchAfterSearch()
+        {
+            string contentFirstNote = "Learning is great!";
+            string contentSecondNote = "Book list for me to read";
+            Notes notes = new Notes();
+            notes.AddNote(contentFirstNote);
+            notes.AddNote(contentSecondNote);
+            notes.SearchNotes("Book");
+            string expected = "\n\tDisplaying notes...\r\n\tID: 2\r\n\tName: Book list\r\n\tContent: Book list for me to read\r\n\n\tEnd of list.\r\n";
+            using (StringWriter stringWriter = new StringWriter())
+            {
+                Console.SetOut(stringWriter);
+                stringWriter.ToString().ShouldNotContain(expected);
+                notes.DisplayNotes();
+                stringWriter.ToString().ShouldContain(expected);
+            }
+        }
+
+        [TestMethod]
+        public void ShouldReturnBothMatchesAfterSearch()
+        {
+            string contentFirstNote = "Books are great!";
+            string contentSecondNote = "Book list for me to read";
+            Notes notes = new Notes();
+            notes.AddNote(contentFirstNote);
+            notes.AddNote(contentSecondNote);
+            notes.SearchNotes("Book");
+            string expected = "\n\tDisplaying notes...\r\n\tID: 1\r\n\tName: Books are\r\n\tContent: Books are great!\r\n\tID: 2\r\n\tName: Book list\r\n\tContent: Book list for me to read\r\n\n\tEnd of list.\r\n";
+            using (StringWriter stringWriter = new StringWriter())
+            {
+                Console.SetOut(stringWriter);
+                stringWriter.ToString().ShouldNotContain(expected);
+                notes.DisplayNotes();
+                stringWriter.ToString().ShouldContain(expected);
+            }
         }
 
         private Note GetCurrentEnumerator(Notes notes, int position = 0)

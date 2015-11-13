@@ -256,8 +256,25 @@ namespace Notes
             Notes notes = new Notes();
             notes.AddNote(contentFirstNote);
             notes.AddNote(contentSecondNote);
-            notes.SearchNotes("Book");
+            notes = notes.SearchNotes("Book");
             string expected = "\n\tDisplaying notes...\r\n\tID: 2\r\n\tName: Book list\r\n\tContent: Book list for me to read\r\n\n\tEnd of list.\r\n";
+            using (StringWriter stringWriter = new StringWriter())
+            {
+                Console.SetOut(stringWriter);
+                stringWriter.ToString().ShouldNotContain(expected);
+                notes.DisplayNotes();
+                stringWriter.ToString().ShouldContain(expected);
+            }
+        }
+
+        [TestMethod]
+        public void ShouldSearchCaseInsensitive()
+        {
+            string content = "Book list for me to read";
+            Notes notes = new Notes();
+            notes.AddNote(content);
+            notes = notes.SearchNotes("book");
+            string expected = "\n\tDisplaying notes...\r\n\tID: 1\r\n\tName: Book list\r\n\tContent: Book list for me to read\r\n\n\tEnd of list.\r\n";
             using (StringWriter stringWriter = new StringWriter())
             {
                 Console.SetOut(stringWriter);
@@ -275,13 +292,46 @@ namespace Notes
             Notes notes = new Notes();
             notes.AddNote(contentFirstNote);
             notes.AddNote(contentSecondNote);
-            notes.SearchNotes("Book");
+            notes = notes.SearchNotes("Book");
             string expected = "\n\tDisplaying notes...\r\n\tID: 1\r\n\tName: Books are\r\n\tContent: Books are great!\r\n\tID: 2\r\n\tName: Book list\r\n\tContent: Book list for me to read\r\n\n\tEnd of list.\r\n";
             using (StringWriter stringWriter = new StringWriter())
             {
                 Console.SetOut(stringWriter);
                 stringWriter.ToString().ShouldNotContain(expected);
                 notes.DisplayNotes();
+                stringWriter.ToString().ShouldContain(expected);
+            }
+        }
+
+        [TestMethod]
+        public void ShouldEditNote()
+        {
+            string content = "Book list for me to read";
+            string newContent = "I edited this note!";
+            Notes notes = new Notes();
+            notes.AddNote(content);
+            notes.EditNote("1", newContent);
+            Note note = new Note();
+            note = GetCurrentEnumerator(notes);
+
+            note.Id.ShouldContain("1");
+            note.Name.ShouldContain("Book list");
+            note.Content.ShouldContain(newContent);
+        }
+
+        [TestMethod]
+        public void ShouldGiveMessageAtEditIfNoteDoesNotExist()
+        {
+            string content = "Book list for me to read";
+            string newContent = "I edited this note!";
+            Notes notes = new Notes();
+            notes.AddNote(content);
+            string expected = "\r\n\tID invalid. There is no note with this ID.";
+            using (StringWriter stringWriter = new StringWriter())
+            {
+                Console.SetOut(stringWriter);
+                stringWriter.ToString().ShouldNotContain(expected);
+                notes.EditNote("2", newContent);
                 stringWriter.ToString().ShouldContain(expected);
             }
         }

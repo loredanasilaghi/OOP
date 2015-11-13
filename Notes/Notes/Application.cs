@@ -25,6 +25,10 @@ namespace Notes
                 Console.WriteLine("\t\t-delete <ID>");
                 Console.WriteLine("\t\t-list");
                 Console.WriteLine("\t\t-export <path>");
+                Console.WriteLine("\t\t-search <word>");
+                Console.WriteLine("\t\t-search <word> -export <path>");
+                Console.WriteLine("\t\t-edit <ID> <newcontent>");
+
                 return 1;
             }
 
@@ -46,7 +50,23 @@ namespace Notes
                         {
                             string name = args[1];
                             string content = args[2];
-                            notes.AddNote(name, content);
+                            notes.AddNote(content, name);
+                            txt.SaveNotes(notes);
+                        }
+                        else
+                        {
+                            InvalidCommand();
+                            return -1;
+                        }
+                        break;
+                    }
+                case "-edit":
+                    {
+                        if(args.Length == 3)
+                        {
+                            string id = args[1];
+                            string content = args[2];
+                            notes.EditNote(id, content);
                             txt.SaveNotes(notes);
                         }
                         else
@@ -67,14 +87,14 @@ namespace Notes
                         if (args.Length == 2)
                         {
                             string word = args[1];
-                            notes.SearchNotes(word);
+                            notes = notes.SearchNotes(word);
                             notes.DisplayNotes();
                         }
                         else if (args.Length == 4 && args[2] =="-export")
                         {
                             string word = args[1];
                             string path = args[3];
-                            notes.SearchNotes(word);
+                            notes = notes.SearchNotes(word);
                             notes.ExportNotesToHtml(path, notes);
                         }
                         else

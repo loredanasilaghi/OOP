@@ -43,26 +43,65 @@ namespace Notes
         {
             allNotesList = list;
         }
-    
-        public void AddNote(string content, string name="")
+
+        public void EditNote(string id, string newContent)
+        {
+            bool found = false;
+            for (int i = 0; i <= allNotesList.Count - 1; i++)
+            {
+                if (String.Equals(allNotesList[i].Id, id) == true)
+                {
+                    found = true;
+                    var name = allNotesList[i].Name;
+                    RemoveNote(id);
+                    AddNote(newContent, name, id);
+                    break;
+                }
+            }
+            if (found == false)
+            {
+                Console.WriteLine("\r\n\tID invalid. There is no note with this ID.");
+            }
+        }
+        public string GenerateId()
+        {
+            string id ="";
+            if (allNotesList.Count == 0)
+            {
+                id = "1";
+            }
+            else
+            {
+                var lastElement = allNotesList[allNotesList.Count - 1];
+                id = (int.Parse(lastElement.Id) + 1).ToString();
+            }
+            return id;
+        }
+
+        public void AddNote(string content)
         {
             Note note = new Note();
             note.Content = content;
-            if (name == "")
-            {
-                note.Name = GenerateNoteName(content);
-            }
-            else
-                note.Name = name;
-            if (allNotesList.Count == 0)
-            {
-                note.Id = "1";
-            }
-            else
-            {
-                var lastElement = allNotesList[allNotesList.Count -1];
-                note.Id = (int.Parse(lastElement.Id) + 1).ToString();
-            }
+            note.Name = GenerateNoteName(content);
+            note.Id = GenerateId();
+            allNotesList.Add(note);
+        }
+        
+        public void AddNote(string content, string name)
+        {
+            Note note = new Note();
+            note.Content = content;
+            note.Name = name;
+            note.Id = GenerateId();
+            allNotesList.Add(note);
+        }
+
+        public void AddNote(string content, string name, string id)
+        {
+            Note note = new Note();
+            note.Content = content;
+            note.Name = name;
+            note.Id = id;
             allNotesList.Add(note);
         }
 
@@ -122,20 +161,17 @@ namespace Notes
             System.Diagnostics.Process.Start(path);
         }
 
-        public void SearchNotes(string word)
+        public Notes SearchNotes(string word)
         {
-            List<Note> notesToRemove = new List<Note>();
+            Notes searchResult = new Notes();
             foreach (var note in allNotesList)
             {
-                if (!note.Name.Contains(word) && (!note.Content.Contains(word)))
+                if (note.Name.ToLower().Contains(word.ToLower()) || (note.Content.ToLower().Contains(word.ToLower())))
                 {
-                    notesToRemove.Add(note);
+                    searchResult.AddNote(note.Content, note.Name, note.Id);
                 }
             }
-            for (int i = 0; i < notesToRemove.Count; i++)
-            {
-                allNotesList.Remove(notesToRemove[i]);
-            }
+            return searchResult;
         }
         
         public static string ReplaceContent(string content, string toBeReplaced, string toReplace)

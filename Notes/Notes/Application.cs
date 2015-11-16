@@ -27,7 +27,8 @@ namespace Notes
                 Console.WriteLine("\t\t-export <path>");
                 Console.WriteLine("\t\t-search <word>");
                 Console.WriteLine("\t\t-search <word> -export <path>");
-                Console.WriteLine("\t\t-edit <ID> <newcontent>");
+                Console.WriteLine("\t\t-edit <ID> <newContent>");
+                Console.WriteLine("\t\t-rename <ID> <newName>");
 
                 return 1;
             }
@@ -60,6 +61,7 @@ namespace Notes
                         }
                         break;
                     }
+
                 case "-edit":
                     {
                         if(args.Length == 3)
@@ -76,6 +78,24 @@ namespace Notes
                         }
                         break;
                     }
+
+                case "-rename":
+                    {
+                        if (args.Length == 3)
+                        {
+                            string id = args[1];
+                            string newName = args[2];
+                            notes.RenameNote(id, newName);
+                            txt.SaveNotes(notes);
+                        }
+                        else
+                        {
+                            InvalidCommand();
+                            return -1;
+                        }
+                        break;
+                    }
+
                 case "-list":
                     {
                         notes.DisplayNotes();

@@ -336,6 +336,39 @@ namespace Notes
             }
         }
 
+        [TestMethod]
+        public void ShouldRenameNote()
+        {
+            string content = "Book list for me to read";
+            string newName = "New Name";
+            Notes notes = new Notes();
+            notes.AddNote(content);
+            notes.RenameNote("1", newName);
+            Note note = new Note();
+            note = GetCurrentEnumerator(notes);
+
+            note.Id.ShouldContain("1");
+            note.Name.ShouldContain(newName);
+            note.Content.ShouldContain(content);
+        }
+
+        [TestMethod]
+        public void ShouldGiveMessageAtRenameIfNoteDoesNotExist()
+        {
+            string content = "Book list for me to read";
+            string newName = "New Name";
+            Notes notes = new Notes();
+            notes.AddNote(content);
+            string expected = "\r\n\tID invalid. There is no note with this ID.";
+            using (StringWriter stringWriter = new StringWriter())
+            {
+                Console.SetOut(stringWriter);
+                stringWriter.ToString().ShouldNotContain(expected);
+                notes.RenameNote("2", newName);
+                stringWriter.ToString().ShouldContain(expected);
+            }
+        }
+
         private Note GetCurrentEnumerator(Notes notes, int position = 0)
         {
             Note note = new Note();

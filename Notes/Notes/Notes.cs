@@ -46,23 +46,22 @@ namespace Notes
 
         public void EditNote(string id, string newContent)
         {
-            bool found = false;
-            for (int i = 0; i <= allNotesList.Count - 1; i++)
-            {
-                if (String.Equals(allNotesList[i].Id, id) == true)
-                {
-                    found = true;
-                    var name = allNotesList[i].Name;
-                    RemoveNote(id);
-                    AddNote(newContent, name, id);
-                    break;
-                }
-            }
-            if (found == false)
-            {
+            var note = allNotesList.Find(n => n.Id == id);
+            if (note!= null)
+                note.Content = newContent;
+            else
                 Console.WriteLine("\r\n\tID invalid. There is no note with this ID.");
-            }
         }
+
+        public void RenameNote(string id, string newName)
+        {
+            var note = allNotesList.Find(n => n.Id == id);
+            if (note != null)
+                note.Name = newName;
+            else
+                Console.WriteLine("\r\n\tID invalid. There is no note with this ID.");
+        }
+
         public string GenerateId()
         {
             string id ="";

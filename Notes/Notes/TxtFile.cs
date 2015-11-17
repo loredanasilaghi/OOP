@@ -55,16 +55,16 @@ namespace Notes
             string nameKeyWord = "#Name:";
             string contentKeyWord = "#Content:";
 
-            if (line.StartsWith(idKeyWord))
+            if (line.Contains(idKeyWord))
             {
                 AddNoteAndIncreaseCounter(id, name, content, ref counter);
                 id = line.Substring(idKeyWord.Length);
             }
-            else if (line.StartsWith(nameKeyWord))
+            else if (line.Contains(nameKeyWord))
             {
                 name = line.Substring(nameKeyWord.Length);
             }
-            else if (line.StartsWith(contentKeyWord))
+            else if (line.Contains(contentKeyWord))
             {
                 content = line.Substring(contentKeyWord.Length);
             }
@@ -76,7 +76,7 @@ namespace Notes
 
         public void AddNoteAndIncreaseCounter(string id, string name, string content, ref int counter)
         {
-            if (id != string.Empty)
+            if (id != "")
             {
                 Note note = new Note(id, name, content);
                 noteList.Add(note);

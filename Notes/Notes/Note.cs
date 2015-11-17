@@ -10,7 +10,7 @@ namespace Notes
     {
         private string name;
         private string content;
-        private string id;
+        private string id = "";
         
         public string Name
         {
@@ -32,11 +32,36 @@ namespace Notes
 
         public Note() { }
 
+        public Note(string content)
+        {
+            Content = content;
+            Name = GenerateNoteName(content);
+        }
+
+        public Note(string content, string name)
+        {
+            Content = content;
+            Name = name;
+        }
+
         public Note(string id, string name, string content)
         {
             Id = id;
             Name = name;
             Content = content;
+        }
+
+        public string GenerateNoteName(string content)
+        {
+            string[] contentArray = content.Split(' ');
+            string name = string.Empty;
+            if (contentArray.Length == 1)
+            {
+                name = contentArray[0];
+            }
+            else
+                name = contentArray[0] + " " + contentArray[1];
+            return name;
         }
     }
 }

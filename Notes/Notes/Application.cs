@@ -36,7 +36,6 @@ namespace Notes
             Notes notes = new Notes();
             TxtFile txt = new TxtFile();
             notes = txt.LoadNotes();
-
             switch (args[0])
             {
                 case "-add":
@@ -44,14 +43,16 @@ namespace Notes
                         if (args.Length == 2)
                         {
                             string content = args[1];
-                            notes.AddNote(content);
+                            Note note = new Note(content);
+                            notes.AddNote(note);
                             txt.SaveNotes(notes);
                         }
                         else if (args.Length == 3)
                         {
                             string name = args[1];
                             string content = args[2];
-                            notes.AddNote(content, name);
+                            Note note = new Note(content, name);
+                            notes.AddNote(note);
                             txt.SaveNotes(notes);
                         }
                         else
@@ -98,7 +99,7 @@ namespace Notes
 
                 case "-list":
                     {
-                        notes.DisplayNotes();
+                        notes.Display();
                         break;
                     }
 
@@ -107,15 +108,15 @@ namespace Notes
                         if (args.Length == 2)
                         {
                             string word = args[1];
-                            notes = notes.SearchNotes(word);
-                            notes.DisplayNotes();
+                            notes = notes.Search(word);
+                            notes.Display();
                         }
                         else if (args.Length == 4 && args[2] =="-export")
                         {
                             string word = args[1];
                             string path = args[3];
-                            notes = notes.SearchNotes(word);
-                            notes.ExportNotesToHtml(path, notes);
+                            notes = notes.Search(word);
+                            notes.ExportToHtml(path, notes);
                         }
                         else
                         {
@@ -130,7 +131,7 @@ namespace Notes
                         if (args.Length == 2)
                         {
                             string path = args[1];
-                            notes.ExportNotesToHtml(path, notes);
+                            notes.ExportToHtml(path, notes);
                         }
                         else
                         {

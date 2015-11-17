@@ -44,27 +44,30 @@ namespace Notes
             allNotesList = list;
         }
 
-        public void EditNote(string id, string newContent)
+        public delegate void UpdateNoteDelegate(Note note);
+
+        public void UpdateNote(UpdateNoteDelegate updateNote, string id)
         {
             var note = allNotesList.Find(n => n.Id == id);
-            if (note!= null)
-                note.Content = newContent;
+            if (note != null)
+                updateNote(note);
             else
                 Console.WriteLine("\r\n\tID invalid. There is no note with this ID.");
+        }
+
+        public void EditNote(string id, string newContent)
+        {
+            UpdateNote(n => n.Content = newContent, id);
         }
 
         public void RenameNote(string id, string newName)
         {
-            var note = allNotesList.Find(n => n.Id == id);
-            if (note != null)
-                note.Name = newName;
-            else
-                Console.WriteLine("\r\n\tID invalid. There is no note with this ID.");
+            UpdateNote(n => n.Name = newName, id);
         }
 
         public string GenerateId()
         {
-            string id ="";
+            string id = "";
             if (allNotesList.Count == 0)
             {
                 id = "1";
@@ -77,46 +80,13 @@ namespace Notes
             return id;
         }
 
-        public void AddNote(string content)
+        public void AddNote(Note note)
         {
-            Note note = new Note();
-            note.Content = content;
-            note.Name = GenerateNoteName(content);
-            note.Id = GenerateId();
+            if(note.Id == "")
+                note.Id = GenerateId();
             allNotesList.Add(note);
         }
-        
-        public void AddNote(string content, string name)
-        {
-            Note note = new Note();
-            note.Content = content;
-            note.Name = name;
-            note.Id = GenerateId();
-            allNotesList.Add(note);
-        }
-
-        public void AddNote(string content, string name, string id)
-        {
-            Note note = new Note();
-            note.Content = content;
-            note.Name = name;
-            note.Id = id;
-            allNotesList.Add(note);
-        }
-
-        public string GenerateNoteName(string content)
-        {
-            string[] contentArray = content.Split(' ');
-            string name = string.Empty;
-            if (contentArray.Length == 1)
-            {
-                name = contentArray[0];
-            }
-            else
-                name = contentArray[0] + " " + contentArray[1];
-            return name;
-        }
-
+      
         public void RemoveNote(string id)
         {
             bool found = false;
@@ -136,7 +106,7 @@ namespace Notes
             }
         }
         
-        public void DisplayNotes()
+        public void Display()
         {
             Console.WriteLine("\n\tDisplaying notes...");
             for (int i = 0; i < allNotesList.Count; i++)
@@ -149,7 +119,7 @@ namespace Notes
             Console.WriteLine("\n\tEnd of list.");
         }
 
-        public void ExportNotesToHtml(string path, Notes notesList)
+        public void ExportToHtml(string path, Notes notesList)
         {
             if (!path.Contains(".html"))
                 path += ".html";
@@ -160,14 +130,15 @@ namespace Notes
             System.Diagnostics.Process.Start(path);
         }
 
-        public Notes SearchNotes(string word)
+        public Notes Search(string word)
         {
             Notes searchResult = new Notes();
             foreach (var note in allNotesList)
             {
                 if (note.Name.ToLower().Contains(word.ToLower()) || (note.Content.ToLower().Contains(word.ToLower())))
                 {
-                    searchResult.AddNote(note.Content, note.Name, note.Id);
+                    Note enote = new Note(note.Id, note.Name, note.Content);
+                    searchResult.AddNote(enote);
                 }
             }
             return searchResult;
@@ -178,6 +149,5 @@ namespace Notes
             content = content.Replace(toBeReplaced, toReplace);
             return content;
         }
-        
     }
 }

@@ -32,16 +32,13 @@ namespace Notes
 
         public Note() { }
 
-        public Note(string content)
+        public Note(string content, string name=null)
         {
             Content = content;
-            Name = GenerateNoteName(content);
-        }
-
-        public Note(string content, string name)
-        {
-            Content = content;
-            Name = name;
+            if (name == null)
+                Name = GenerateNoteName(content);
+            else
+                Name = name;
         }
 
         public Note(string id, string name, string content)
@@ -63,5 +60,6 @@ namespace Notes
                 name = contentArray[0] + " " + contentArray[1];
             return name;
         }
+
     }
 }

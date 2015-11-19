@@ -55,6 +55,12 @@ namespace Notes
                 Console.WriteLine("\r\n\tID invalid. There is no note with this ID.");
         }
 
+        public Note FindId(string id)
+        {
+            var note = allNotesList.Find(n => n.Id == id);
+            return note;
+        }
+
         public void EditNote(string id, string newContent)
         {
             UpdateNote(n => n.Content = newContent, id);

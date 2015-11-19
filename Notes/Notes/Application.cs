@@ -9,6 +9,7 @@ namespace Notes
 {
     public class Application
     {
+        
         public static int Main(string[] args)
         {
             if (args.Length == 0)
@@ -32,141 +33,75 @@ namespace Notes
 
                 return 1;
             }
-
             Notes notes = new Notes();
             TxtFile txt = new TxtFile();
             notes = txt.LoadNotes();
+            Operations operation = new Operations();
+
+            CommandLineParser parser = new CommandLineParser();
+            parser.Parse(args, out operation);
+
+            switch (operation.Operation)
+            {
+                case Operations.PossibleOperation.Add:
+                    {
+                        Note note = new Note(operation.AddParameter.Content, operation.AddParameter.Name);
+                        notes.AddNote(note);
+                        txt.SaveNotes(notes);
+                        break;
+                    }
+            }
+
+
             switch (args[0])
             {
                 case "-add":
                     {
-                        if (args.Length == 2)
-                        {
-                            string content = args[1];
-                            Note note = new Note(content);
-                            notes.AddNote(note);
+                        if (CommandLineParser.Add(args, notes))
                             txt.SaveNotes(notes);
-                        }
-                        else if (args.Length == 3)
-                        {
-                            string name = args[1];
-                            string content = args[2];
-                            Note note = new Note(content, name);
-                            notes.AddNote(note);
-                            txt.SaveNotes(notes);
-                        }
-                        else
-                        {
-                            InvalidCommand();
-                            return -1;
-                        }
                         break;
                     }
-
                 case "-edit":
                     {
-                        if(args.Length == 3)
-                        {
-                            string id = args[1];
-                            string content = args[2];
-                            notes.EditNote(id, content);
+                        if (CommandLineParser.Edit(args, notes))
                             txt.SaveNotes(notes);
-                        }
-                        else
-                        {
-                            InvalidCommand();
-                            return -1;
-                        }
                         break;
                     }
-
                 case "-rename":
                     {
-                        if (args.Length == 3)
-                        {
-                            string id = args[1];
-                            string newName = args[2];
-                            notes.RenameNote(id, newName);
+                        if (CommandLineParser.Rename(args, notes))
                             txt.SaveNotes(notes);
-                        }
-                        else
-                        {
-                            InvalidCommand();
-                            return -1;
-                        }
                         break;
                     }
-
                 case "-list":
                     {
                         notes.Display();
                         break;
                     }
-
                 case "-search":
                     {
-                        if (args.Length == 2)
-                        {
-                            string word = args[1];
-                            notes = notes.Search(word);
-                            notes.Display();
-                        }
-                        else if (args.Length == 4 && args[2] =="-export")
-                        {
-                            string word = args[1];
-                            string path = args[3];
-                            notes = notes.Search(word);
-                            notes.ExportToHtml(path, notes);
-                        }
-                        else
-                        {
-                            InvalidCommand();
-                            return -1;
-                        }
+                        CommandLineParser.Search(args, notes);
                         break;
                     }
-
                 case "-export":
                     {
-                        if (args.Length == 2)
-                        {
-                            string path = args[1];
-                            notes.ExportToHtml(path, notes);
-                        }
-                        else
-                        {
-                            InvalidCommand();
-                            return -1;
-                        }
+                        CommandLineParser.Export(args, notes);
                         break;
                     }
                 case "-delete":
                     {
-                        if (args.Length == 2)
-                        {
-                            string id = args[1];
-                            notes.RemoveNote(id);
+                        if (CommandLineParser.Delete(args, notes))
                             txt.SaveNotes(notes);
-                        }
-                        else
-                        {
-                            InvalidCommand();
-                            return -1;
-                        }
                         break;
                     }
                 default:
                     {
-                        InvalidCommand();
+                        CommandLineParser.InvalidCommand();
                         return -1;
                     }
             }
             return 1;
         }
 
-        public static void InvalidCommand()
-        {
-            Console.WriteLine("\n\tInvalid command. Press -? for help.");
-        }
     }
 }

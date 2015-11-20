@@ -6,8 +6,11 @@ using System.Threading.Tasks;
 
 namespace Notes
 {
-    public interface IOperation
+    public class ListCommand: IOperation
     {
-        void Operation(Options options,Notes notes);
+        public void Operation(Options options, Notes notes)
+        {
+            notes.Display();
+        }
     }
 }

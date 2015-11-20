@@ -1,0 +1,21 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Notes
+{
+    public class RenameCommand : IOperation
+    {
+        string id;
+        string name;
+
+        public void Operation(Options options, Notes notes)
+        {
+            id = options.RenameEnterId;
+            name = options.Rename;
+            notes.RenameNote(id, name);
+        }
+    }
+}

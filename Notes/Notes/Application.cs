@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using CommandLine;
+using CommandLine.Text;
 
 namespace Notes
 {
@@ -36,71 +38,61 @@ namespace Notes
             Notes notes = new Notes();
             TxtFile txt = new TxtFile();
             notes = txt.LoadNotes();
-            Operations operation = new Operations();
 
-            CommandLineParser parser = new CommandLineParser();
-            parser.Parse(args, out operation);
-
-            switch (operation.Operation)
+            Options options = new Options();
+            Parser parser = new Parser();
+            try
             {
-                case Operations.PossibleOperation.Add:
-                    {
-                        Note note = new Note(operation.AddParameter.Content, operation.AddParameter.Name);
-                        notes.AddNote(note);
-                        txt.SaveNotes(notes);
-                        break;
-                    }
+                parser.ParseArguments(args, options);
+            }
+            catch (System.ArgumentNullException)
+            {
+                InvalidCommand();
             }
 
-
-            switch (args[0])
+            if (options.AddContent != null)
             {
-                case "-add":
-                    {
-                        if (CommandLineParser.Add(args, notes))
-                            txt.SaveNotes(notes);
-                        break;
-                    }
-                case "-edit":
-                    {
-                        if (CommandLineParser.Edit(args, notes))
-                            txt.SaveNotes(notes);
-                        break;
-                    }
-                case "-rename":
-                    {
-                        if (CommandLineParser.Rename(args, notes))
-                            txt.SaveNotes(notes);
-                        break;
-                    }
-                case "-list":
-                    {
-                        notes.Display();
-                        break;
-                    }
-                case "-search":
-                    {
-                        CommandLineParser.Search(args, notes);
-                        break;
-                    }
-                case "-export":
-                    {
-                        CommandLineParser.Export(args, notes);
-                        break;
-                    }
-                case "-delete":
-                    {
-                        if (CommandLineParser.Delete(args, notes))
-                            txt.SaveNotes(notes);
-                        break;
-                    }
-                default:
-                    {
-                        CommandLineParser.InvalidCommand();
-                        return -1;
-                    }
+                AddCommand addNote = new AddCommand();
+                addNote.Operation(options, notes);
+                txt.SaveNotes(notes);
             }
-            return 1;
+            else if (options.EditEnterId != null && options.Edit != null)
+            {
+                EditCommand editNote = new EditCommand();
+                editNote.Operation(options, notes);
+                txt.SaveNotes(notes);
+            }
+            else if (options.List == true)
+            {
+                ListCommand listNotes = new ListCommand();
+                listNotes.Operation(options, notes);
+            }
+            else if (options.RenameEnterId != null && options.Rename != null)
+            {
+                RenameCommand renameNote = new RenameCommand();
+                renameNote.Operation(options, notes);
+                txt.SaveNotes(notes);
+            }
+            else if (options.Search != null)
+            {
+                SearchCommand search = new SearchCommand();
+                search.Operation(options, notes);
+                notes.Display();
+            }
+            else if (options.Export != null)
+            {
+                ExportCommand export = new ExportCommand();
+                export.Operation(options, notes);
+            }
+            else
+                InvalidCommand();
+            
+                return 1;
+        }
+
+        public static void InvalidCommand()
+        {
+            Console.WriteLine("\n\tInvalid command. Press -? for help.");
         }
 
     }

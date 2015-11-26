@@ -114,16 +114,73 @@ namespace Notes
         
         public void Display()
         {
-            Console.WriteLine("\n\tDisplaying notes...");
-            for (int i = 0; i < allNotesList.Count; i++)
+            if (allNotesList.Count == 0)
+                Console.WriteLine("\r\n\tThere is no note.");
+            else
             {
-                Console.WriteLine("\tID: {0}", allNotesList[i].Id);
-                Console.WriteLine("\tName: {0}", allNotesList[i].Name);
-                allNotesList[i].Content = ReplaceContent(allNotesList[i].Content, "\\+", "\n" + "\t\t");
-                Console.WriteLine("\tContent: {0}", allNotesList[i].Content);
+                Console.WriteLine("\n\tDisplaying notes...");
+                for (int i = 0; i < allNotesList.Count; i++)
+                {
+                    Console.WriteLine("\tID: {0}", allNotesList[i].Id);
+                    Console.WriteLine("\tName: {0}", allNotesList[i].Name);
+                    allNotesList[i].Content = ReplaceContent(allNotesList[i].Content, "\\+", "\n" + "\t\t");
+                    Console.WriteLine("\tContent: {0}", allNotesList[i].Content);
+                }
+                Console.WriteLine("\n\tEnd of list.");
+            }
+        }
+
+        public void DisplayTags()
+        {
+            List<string> tags = new List<string>();
+            Console.WriteLine("\n\tDisplaying tags...");
+            foreach (var note in allNotesList)
+            {
+                ExtractTag(tags, note.Name);
+                ExtractTag(tags, note.Content);
+            }
+            tags.Sort();
+            tags = tags.Distinct().ToList();
+            Console.WriteLine("\r\n\tTags:");
+            foreach (var tag in tags)
+            {
+                Console.WriteLine("\r\n\t" + tag);
             }
             Console.WriteLine("\n\tEnd of list.");
         }
+
+        private static void ExtractTag(List<string> tags, string givenString)
+        {
+            string tag = string.Empty;
+            bool isTag = false;
+            for (int i = 0; i < givenString.Count(); i++)
+            {
+                if (givenString[i] == '#' || givenString[i] == '@')
+                {
+                    isTag = true;
+                }
+                if (isTag && (givenString[i] == ' ' || givenString[i] == '\n' ||givenString[i] == '\r'))
+                {
+                    isTag = false;
+                    tags.Add(tag);
+                    tag = string.Empty;
+                }
+                if (isTag)
+                {
+                    tag += givenString[i];
+                }
+            }
+            if (isTag)
+            {
+                tags.Add(tag);
+            }
+        }
+
+        public IEnumerable<string> GetWordFromString(string givenString)
+        {
+            return givenString.Split(' ', '\n', '\r').Where(i => i.Contains("#") || i.Contains("@"));
+        }
+
 
         public void ExportToHtml(string path, Notes notesList)
         {
@@ -146,10 +203,65 @@ namespace Notes
                     Note enote = new Note(note.Id, note.Name, note.Content);
                     searchResult.AddNote(enote);
                 }
+                else
+                    Console.WriteLine("\r\n\tThere is no note containing this search term.");
             }
             return searchResult;
         }
-        
+
+        public Notes FindAnyTag(string[] tags)
+        {
+            Notes searchResult = new Notes();
+            foreach (var note in allNotesList)
+            {
+                foreach (var tag in tags)
+                {
+                    if (note.Name.ToLower().Contains(tag.ToLower()) || (note.Content.ToLower().Contains(tag.ToLower())))
+                    {
+                        Note enote = new Note(note.Id, note.Name, note.Content);
+                        if(!ContainsNote(searchResult, enote))
+                            searchResult.AddNote(enote);
+                    }
+                }
+            }
+            return searchResult;
+        }
+
+        public Notes FindAllTags(string[] tags)
+        {
+            Notes searchResult = new Notes();
+            foreach (var note in allNotesList)
+            {
+                bool found = true;
+                foreach (var tag in tags)
+                {
+                    if (!(note.Name.ToLower().Contains(tag.ToLower()) || (note.Content.ToLower().Contains(tag.ToLower()))))
+                    {
+                        found = false;
+                    }
+                }
+                if (found)
+                {
+                    Note enote = new Note(note.Id, note.Name, note.Content);
+                    if (!ContainsNote(searchResult, enote))
+                        searchResult.AddNote(enote);
+                }
+            }
+            return searchResult;
+        }
+
+        public bool ContainsNote(Notes notes, Note note)
+        {
+            foreach (var currentNote in notes.allNotesList)
+            {
+                if(currentNote.Id == note.Id)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         public static string ReplaceContent(string content, string toBeReplaced, string toReplace)
         {
             content = content.Replace(toBeReplaced, toReplace);

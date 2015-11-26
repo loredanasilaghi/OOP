@@ -9,7 +9,7 @@ using System.IO;
 namespace Notes
 {
     [TestClass]
-    public class UnitTests
+    public class NotesTests
     {
         [TestMethod]
         public void ShouldAddNoteWithoutName()
@@ -227,45 +227,7 @@ namespace Notes
                 stringWriter.ToString().ShouldContain(expected);
             }
         }
-
-        [TestMethod]
-        public void ShouldProcessNotes()
-        {
-            int counter = 0;
-            var myFileContent = @"#Id:1
-        #Name:magazin de
-        #Content:magazin de mezeluri
-        #Id:2
-        #Name:name
-        #Content:new\+content\+is given\+by";
-            var stream = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(myFileContent));
-            TxtFile file = new TxtFile();
-            file.ProcessFileContent(ref counter, stream);
-            var notes = file.GetList();
-
-            notes[0].Id.ShouldContain("1");
-            notes[0].Name.ShouldContain("magazin de");
-            notes[0].Content.ShouldContain("magazin de mezeluri");
-
-            notes[1].Id.ShouldContain("2");
-            notes[1].Name.ShouldContain("name");
-            notes[1].Content.ShouldContain(@"new\+content\+is given\+by");
-        }
-
-        [TestMethod]
-        public void ShouldCreateHtmlContent()
-        {
-            Notes notes = new Notes();
-            Note expectedFirstNote = new Note("Shopping list for today");
-            notes.AddNote(expectedFirstNote);
-            Note expectedSecondNote = new Note(@"new\+content\+is given\+by", "content");
-            notes.AddNote(expectedSecondNote);
-            HtmlDocument html = new HtmlDocument();
-            string actualHtmlContent = html.CreateHtmlDocument(notes);
-            string expectedHtmlContent = "<html>\r\n\t<head>\r\n\t\t<title>\r\n\t\t\tNotesList\r\n\t\t</title>\r\n\t</head><body>\r\n\t\t<h1>\r\n\t\t\tNotesList\r\n\t\t</h1><p>Id: 1\r\n</p><p>Name: Shopping list\r\n</p><p>Content: Shopping list for today\r\n\r\n</p><p>Id: 2\r\n</p><p>Name: content\r\n</p><p>Content: new&lt;br/&gt;content&lt;br/&gt;is given&lt;br/&gt;by\r\n\r\n</p>\r\n\t</body>\r\n</html>";
-            actualHtmlContent.ShouldContain(expectedHtmlContent);
-        }
-
+       
         [TestMethod]
         public void ShouldReturnASingleMatchAfterSearch()
         {
@@ -304,6 +266,197 @@ namespace Notes
                 Console.SetOut(stringWriter);
                 stringWriter.ToString().ShouldNotContain(expected);
                 notes.Display();
+                stringWriter.ToString().ShouldContain(expected);
+            }
+        }
+
+        [TestMethod]
+        public void ShouldSearchAnyTagsContentWithSharp()
+        {
+            string firstNoteContent = "Book to #read";
+            string secondNoteContent = "I have to #send these documents";
+            string thirdNoteContent =  "Just something to read";
+            string fourthNoteContent = "Something to #read and #send";
+            string[] tags = { "#send", "#read" };
+            Notes notes = new Notes();
+            Note expectedFirstNote = new Note(firstNoteContent);
+            Note expectedSecondNote = new Note(secondNoteContent);
+            Note expectedThirdNote = new Note(thirdNoteContent);
+            Note expectedFourthNote = new Note(fourthNoteContent);
+            notes.AddNote(expectedFirstNote);
+            notes.AddNote(expectedSecondNote);
+            notes.AddNote(expectedThirdNote);
+            notes.AddNote(expectedFourthNote);
+            notes = notes.FindAnyTag(tags);
+            string expected = "\n\tDisplaying notes...\r\n\tID: 1\r\n\tName: Book to\r\n\tContent: Book to #read\r\n\tID: 2\r\n\tName: I have\r\n\tContent: I have to #send these documents\r\n\tID: 4\r\n\tName: Something to\r\n\tContent: Something to #read and #send\r\n\n\tEnd of list.\r\n";
+            using (StringWriter stringWriter = new StringWriter())
+            {
+                Console.SetOut(stringWriter);
+                stringWriter.ToString().ShouldNotContain(expected);
+                notes.Display();
+                stringWriter.ToString().ShouldContain(expected);
+            }
+        }
+
+        [TestMethod]
+        public void ShouldSearchAllTagsContentWithSharp()
+        {
+            string firstNoteContent = "Book to #read";
+            string secondNoteContent = "I have to #send these documents";
+            string thirdNoteContent = "Just something to read";
+            string fourthNoteContent = "Something to #read and #send";
+            string[] tags = { "#send", "#read" };
+            Notes notes = new Notes();
+            Note expectedFirstNote = new Note(firstNoteContent);
+            Note expectedSecondNote = new Note(secondNoteContent);
+            Note expectedThirdNote = new Note(thirdNoteContent);
+            Note expectedFourthNote = new Note(fourthNoteContent);
+            notes.AddNote(expectedFirstNote);
+            notes.AddNote(expectedSecondNote);
+            notes.AddNote(expectedThirdNote);
+            notes.AddNote(expectedFourthNote);
+            notes = notes.FindAllTags(tags);
+            string expected = "\n\tDisplaying notes...\r\n\tID: 4\r\n\tName: Something to\r\n\tContent: Something to #read and #send\r\n\n\tEnd of list.\r\n";
+            using (StringWriter stringWriter = new StringWriter())
+            {
+                Console.SetOut(stringWriter);
+                stringWriter.ToString().ShouldNotContain(expected);
+                notes.Display();
+                stringWriter.ToString().ShouldContain(expected);
+            }
+        }
+
+        [TestMethod]
+        public void ShouldSearchAllTagsContentWithAt()
+        {
+            string firstNoteContent = "Book to @read";
+            string secondNoteContent = "I have to @send these documents";
+            string thirdNoteContent = "Just something to read";
+            string fourthNoteContent = "Something to @read and @send";
+            string[] tags = { "@send", "@read" };
+            Notes notes = new Notes();
+            Note expectedFirstNote = new Note(firstNoteContent);
+            Note expectedSecondNote = new Note(secondNoteContent);
+            Note expectedThirdNote = new Note(thirdNoteContent);
+            Note expectedFourthNote = new Note(fourthNoteContent);
+            notes.AddNote(expectedFirstNote);
+            notes.AddNote(expectedSecondNote);
+            notes.AddNote(expectedThirdNote);
+            notes.AddNote(expectedFourthNote);
+            notes = notes.FindAllTags(tags);
+            string expected = "\n\tDisplaying notes...\r\n\tID: 4\r\n\tName: Something to\r\n\tContent: Something to @read and @send\r\n\n\tEnd of list.\r\n";
+            using (StringWriter stringWriter = new StringWriter())
+            {
+                Console.SetOut(stringWriter);
+                stringWriter.ToString().ShouldNotContain(expected);
+                notes.Display();
+                stringWriter.ToString().ShouldContain(expected);
+            }
+        }
+
+        [TestMethod]
+        public void ShouldSearchAnyTagsContentWithAt()
+        {
+            string firstNoteContent = "Book to @read";
+            string secondNoteContent = "I have to @send these documents";
+            string[] tags = { "@send", "@read" };
+            Notes notes = new Notes();
+            Note expectedFirstNote = new Note(firstNoteContent);
+            Note expectedSecondNote = new Note(secondNoteContent);
+            notes.AddNote(expectedFirstNote);
+            notes.AddNote(expectedSecondNote);
+            notes = notes.FindAnyTag(tags);
+            string expected = "\n\tDisplaying notes...\r\n\tID: 1\r\n\tName: Book to\r\n\tContent: Book to @read\r\n\tID: 2\r\n\tName: I have\r\n\tContent: I have to @send these documents\r\n\n\tEnd of list.\r\n";
+            using (StringWriter stringWriter = new StringWriter())
+            {
+                Console.SetOut(stringWriter);
+                stringWriter.ToString().ShouldNotContain(expected);
+                notes.Display();
+                stringWriter.ToString().ShouldContain(expected);
+            }
+        }
+
+        [TestMethod]
+        public void ShouldGiveMessageWhenSearchingTagsIfTagsDoNotExist()
+        {
+            string firstNoteContent = "Book to @read";
+            string[] tags = {"@go"};
+            Notes notes = new Notes();
+            Note expectedFirstNote = new Note(firstNoteContent);
+            notes.AddNote(expectedFirstNote);
+            notes = notes.FindAnyTag(tags);
+            string expected = "\r\n\tThere is no note.";
+            using (StringWriter stringWriter = new StringWriter())
+            {
+                Console.SetOut(stringWriter);
+                stringWriter.ToString().ShouldNotContain(expected);
+                notes.Display();
+                stringWriter.ToString().ShouldContain(expected);
+            }
+        }
+
+        [TestMethod]
+        public void ShouldListTags()
+        {
+            string firstNoteContent = "Book to #read";
+            string secondNoteContent = "I have to @send these documents";
+            Notes notes = new Notes();
+            Note expectedFirstNote = new Note(firstNoteContent);
+            Note expectedSecondNote = new Note(secondNoteContent);
+            notes.AddNote(expectedFirstNote);
+            notes.AddNote(expectedSecondNote);
+            string expected = "\n\tDisplaying tags...\r\n\r\n\tTags:\r\n\r\n\t#read\r\n\r\n\t@send\r\n\n\tEnd of list.\r\n";
+            using (StringWriter stringWriter = new StringWriter())
+            {
+                Console.SetOut(stringWriter);
+                stringWriter.ToString().ShouldNotContain(expected);
+                notes.DisplayTags();
+                stringWriter.ToString().ShouldContain(expected);
+            }
+        }
+
+        [TestMethod]
+        public void ShouldListDistinctTags()
+        {
+            string firstNoteContent = "I have to @send these documents";
+            string secondNoteContent = "Book to #read";
+            string thirdNoteContent = "Something to #read and @send";
+            Notes notes = new Notes();
+            Note expectedFirstNote = new Note(firstNoteContent);
+            Note expectedSecondNote = new Note(secondNoteContent);
+            Note expectedThirdNote = new Note(thirdNoteContent);
+            notes.AddNote(expectedFirstNote);
+            notes.AddNote(expectedSecondNote);
+            notes.AddNote(expectedThirdNote);
+            string expected = "\n\tDisplaying tags...\r\n\r\n\tTags:\r\n\r\n\t#read\r\n\r\n\t@send\r\n\n\tEnd of list.\r\n";
+            using (StringWriter stringWriter = new StringWriter())
+            {
+                Console.SetOut(stringWriter);
+                stringWriter.ToString().ShouldNotContain(expected);
+                notes.DisplayTags();
+                stringWriter.ToString().ShouldContain(expected);
+            }
+        }
+
+        [TestMethod]
+        public void ShouldListTagsWithDifferentHash()
+        {
+            string firstNoteContent = "I have to @send these documents";
+            string secondNoteContent = "Book to #read";
+            string thirdNoteContent = "Something to @read and #send";
+            Notes notes = new Notes();
+            Note expectedFirstNote = new Note(firstNoteContent);
+            Note expectedSecondNote = new Note(secondNoteContent);
+            Note expectedThirdNote = new Note(thirdNoteContent);
+            notes.AddNote(expectedFirstNote);
+            notes.AddNote(expectedSecondNote);
+            notes.AddNote(expectedThirdNote);
+            string expected = "\n\tDisplaying tags...\r\n\r\n\tTags:\r\n\r\n\t#read\r\n\r\n\t#send\r\n\r\n\t@read\r\n\r\n\t@send\r\n\n\tEnd of list.\r\n";
+            using (StringWriter stringWriter = new StringWriter())
+            {
+                Console.SetOut(stringWriter);
+                stringWriter.ToString().ShouldNotContain(expected);
+                notes.DisplayTags();
                 stringWriter.ToString().ShouldContain(expected);
             }
         }

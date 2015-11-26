@@ -13,8 +13,8 @@ namespace Notes
 
         public void Operation(Options options, Notes notes)
         {
-            id = options.RenameEnterId;
-            name = options.Rename;
+            id = options.Rename.Id;
+            name = options.Rename.Name;
             notes.RenameNote(id, name);
         }
     }

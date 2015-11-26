@@ -11,6 +11,7 @@ namespace Notes
         private string name;
         private string content;
         private string id = "";
+        private string[] tags;
         
         public string Name
         {
@@ -60,6 +61,5 @@ namespace Notes
                 name = contentArray[0] + " " + contentArray[1];
             return name;
         }
-
     }
 }

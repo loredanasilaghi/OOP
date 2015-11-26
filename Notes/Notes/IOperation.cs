@@ -8,6 +8,6 @@ namespace Notes
 {
     public interface IOperation
     {
-        void Operation(Options options,Notes notes);
+        void Operation(Options options, Notes notes);
     }
 }

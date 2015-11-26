@@ -51,9 +51,9 @@ namespace Notes
 
         public void ProcessLine(ref string id, ref string name, ref string content, string line, ref int counter)
         {
-            string idKeyWord = "#Id:";
-            string nameKeyWord = "#Name:";
-            string contentKeyWord = "#Content:";
+            string idKeyWord = "*Id:";
+            string nameKeyWord = "*Name:";
+            string contentKeyWord = "*Content:";
 
             if (line.Contains(idKeyWord))
             {
@@ -91,10 +91,10 @@ namespace Notes
             {
                 foreach (var note in notesList)
                 {
-                    file.WriteLine("#Id:" + note.Id);
-                    file.WriteLine("#Name:" + note.Name);
+                    file.WriteLine("*Id:" + note.Id);
+                    file.WriteLine("*Name:" + note.Name);
                     note.Content = ReplaceContent(note.Content, "\n", "\\+");
-                    file.WriteLine("#Content:" + note.Content);
+                    file.WriteLine("*Content:" + note.Content);
                 }
                 Console.WriteLine("\tFile saved.");
                 file.Close();

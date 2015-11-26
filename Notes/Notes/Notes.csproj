@@ -53,18 +53,25 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AddCommand.cs" />
+    <Compile Include="AddSubOptions.cs" />
+    <Compile Include="DeleteCommand.cs" />
     <Compile Include="EditCommand.cs" />
+    <Compile Include="EditSubOptions.cs" />
     <Compile Include="ExportCommand.cs" />
     <Compile Include="HtmlDocument.cs" />
     <Compile Include="IOperation.cs" />
     <Compile Include="ListCommand.cs" />
+    <Compile Include="ListTagsCommand.cs" />
     <Compile Include="Note.cs" />
     <Compile Include="Application.cs" />
     <Compile Include="Notes.cs" />
     <Compile Include="Options.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RenameCommand.cs" />
+    <Compile Include="RenameSubOptions.cs" />
+    <Compile Include="SearchAllTagsCommand.cs" />
     <Compile Include="SearchCommand.cs" />
+    <Compile Include="SearchAnyTagCommand.cs" />
     <Compile Include="TxtFile.cs" />
   </ItemGroup>
   <ItemGroup>

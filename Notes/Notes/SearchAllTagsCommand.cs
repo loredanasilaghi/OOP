@@ -6,16 +6,14 @@ using System.Threading.Tasks;
 
 namespace Notes
 {
-    public class EditCommand: IOperation
+    public class SearchAllTagsCommand: IOperation
     {
-        string id;
-        string content;
-
+        string[] tags;
         public void Operation(Options options, Notes notes)
         {
-            id = options.Edit.Id;
-            content = options.Edit.Content;
-            notes.EditNote(id, content);
+            tags = options.SearchAllTags;
+            notes = notes.FindAllTags(tags);
+            notes.Display();
         }
     }
 }

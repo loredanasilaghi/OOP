@@ -60,8 +60,10 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="HtmlDocumentTests.cs" />
     <Compile Include="OptionsTests.cs" />
-    <Compile Include="UnitTests.cs" />
+    <Compile Include="TxtFileTests.cs" />
+    <Compile Include="NotesTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

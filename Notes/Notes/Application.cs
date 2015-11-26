@@ -11,89 +11,109 @@ namespace Notes
 {
     public class Application
     {
-        
+
         public static int Main(string[] args)
         {
-            if (args.Length == 0)
-            {
-                Console.WriteLine("\n\tUse argument -? for help");
-                return -1;
-            }
-
-            if (args[0] == "-?")
-            {
-                Console.WriteLine("\n\tPossible commands:");
-                Console.WriteLine("\t\t-add <name> <content>");
-                Console.WriteLine("\t\t-add <content>");
-                Console.WriteLine("\t\t-delete <ID>");
-                Console.WriteLine("\t\t-list");
-                Console.WriteLine("\t\t-export <path>");
-                Console.WriteLine("\t\t-search <word>");
-                Console.WriteLine("\t\t-search <word> -export <path>");
-                Console.WriteLine("\t\t-edit <ID> <newContent>");
-                Console.WriteLine("\t\t-rename <ID> <newName>");
-
-                return 1;
-            }
             Notes notes = new Notes();
             TxtFile txt = new TxtFile();
             notes = txt.LoadNotes();
 
             Options options = new Options();
             Parser parser = new Parser();
-            try
+
+            string invokedVerb = "";
+            object invokedVerbInstance = new object();
+
+            if (!CommandLine.Parser.Default.ParseArguments(args, options,
+              (verb, subOptions) =>
+              {
+                  invokedVerb = verb;
+                  invokedVerbInstance = subOptions;
+              }))
             {
                 parser.ParseArguments(args, options);
             }
-            catch (System.ArgumentNullException)
-            {
-                InvalidCommand();
-            }
 
-            if (options.AddContent != null)
+            if (invokedVerb == "add")
+            {
+                var addSubOptions = (AddSubOptions)invokedVerbInstance;
+            }
+            if (invokedVerb == "edit")
+            {
+                var addSubOptions = (EditSubOptions)invokedVerbInstance;
+            }
+            if (invokedVerb == "rename")
+            {
+                var addSubOptions = (RenameSubOptions)invokedVerbInstance;
+            }
+            bool invalidCommand = true;
+            if (options.Add.AddContent != null)
             {
                 AddCommand addNote = new AddCommand();
                 addNote.Operation(options, notes);
                 txt.SaveNotes(notes);
+                invalidCommand = false;
             }
-            else if (options.EditEnterId != null && options.Edit != null)
+           if (options.Edit.Id != null && options.Edit.Content != null)
             {
                 EditCommand editNote = new EditCommand();
                 editNote.Operation(options, notes);
                 txt.SaveNotes(notes);
+                invalidCommand = false;
             }
-            else if (options.List == true)
+            if (options.List == true)
             {
                 ListCommand listNotes = new ListCommand();
                 listNotes.Operation(options, notes);
+                invalidCommand = false;
             }
-            else if (options.RenameEnterId != null && options.Rename != null)
+            if (options.Rename.Id != null && options.Rename.Name != null)
             {
                 RenameCommand renameNote = new RenameCommand();
                 renameNote.Operation(options, notes);
                 txt.SaveNotes(notes);
+                invalidCommand = false;
             }
-            else if (options.Search != null)
+            if (options.Search != null)
             {
                 SearchCommand search = new SearchCommand();
                 search.Operation(options, notes);
-                notes.Display();
+                invalidCommand = false;
             }
-            else if (options.Export != null)
+            if (options.SearchAnyTags != null)
+            {
+                SearchAnyTagCommand search = new SearchAnyTagCommand();
+                search.Operation(options, notes);
+                invalidCommand = false;
+            }
+            if (options.SearchAllTags != null)
+            {
+                SearchAllTagsCommand search = new SearchAllTagsCommand();
+                search.Operation(options, notes);
+                invalidCommand = false;
+            }
+            if (options.ListTags == true)
+            {
+                ListTagsCommand listNotes = new ListTagsCommand();
+                listNotes.Operation(options, notes);
+                invalidCommand = false;
+            }
+            if (options.Export != null)
             {
                 ExportCommand export = new ExportCommand();
                 export.Operation(options, notes);
+                invalidCommand = false;
             }
-            else
-                InvalidCommand();
-            
-                return 1;
+            if (options.Delete != null)
+            {
+                DeleteCommand delete = new DeleteCommand();
+                delete.Operation(options, notes);
+                txt.SaveNotes(notes);
+                invalidCommand = false;
+            }
+            if (invalidCommand)
+                Console.WriteLine("\n\tInvalid command.");
+            return 1;
         }
-
-        public static void InvalidCommand()
-        {
-            Console.WriteLine("\n\tInvalid command. Press -? for help.");
-        }
-
     }
 }

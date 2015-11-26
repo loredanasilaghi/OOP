@@ -6,16 +6,11 @@ using System.Threading.Tasks;
 
 namespace Notes
 {
-    public class EditCommand: IOperation
+    public class ListTagsCommand:IOperation
     {
-        string id;
-        string content;
-
         public void Operation(Options options, Notes notes)
         {
-            id = options.Edit.Id;
-            content = options.Edit.Content;
-            notes.EditNote(id, content);
+            notes.DisplayTags();
         }
     }
 }

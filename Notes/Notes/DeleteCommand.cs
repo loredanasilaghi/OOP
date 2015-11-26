@@ -6,16 +6,13 @@ using System.Threading.Tasks;
 
 namespace Notes
 {
-    public class EditCommand: IOperation
+    public class DeleteCommand: IOperation
     {
         string id;
-        string content;
-
         public void Operation(Options options, Notes notes)
         {
-            id = options.Edit.Id;
-            content = options.Edit.Content;
-            notes.EditNote(id, content);
+            id = options.Delete;
+            notes.RemoveNote(id);
         }
     }
 }
